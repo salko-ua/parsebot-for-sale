@@ -1,0 +1,4 @@
+import os
+
+TOKEN = os.environ.get("BOT_TOKEN", "5999755878:AAG8GDhnLntBSK6ERJyHNPfNEI2wxUvhaSU")
+PROVIDER_TOKEN = os.environ.get("PROVIDER_TOKEN", "1661751239:TEST:6wD1-k5S1-k0AU-il4H")
