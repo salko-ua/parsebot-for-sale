@@ -1,10 +1,122 @@
 from control_db.create_db import BaseDBPart
+from datetime import datetime
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 
 class PremiumUser(BaseDBPart):
     async def telegram_id_exists(self, telegram_id):
-        result = await (await self.cur.execute("""SELECT COUNT(`telegram_id`) 
-                                         FROM `premium_user` 
-                                         WHERE `telegram_id` = ?""", 
-                                         (telegram_id,))).fetchall()
+        result = await (
+            await self.cur.execute(
+                """SELECT COUNT(`telegram_id`) FROM `premium_user` WHERE `telegram_id` = ?""",
+                (telegram_id,),
+            )
+        ).fetchall()
+        return bool(result[0][0])
+
+    async def get_expiration_date(self, telegram_id):
+        expiration_date = await (
+            await self.cur.execute(
+                """SELECT expiration_date FROM `premium_user` WHERE telegram_id = ?""",
+                (telegram_id,),
+            )
+        ).fetchall()
+
+        return expiration_date[0][0]
+
+    async def get_bought_premium(self, telegram_id):
+        bought_premium = await (
+            await self.cur.execute(
+                """SELECT bought_premium FROM `premium_user` WHERE telegram_id = ?""",
+                (telegram_id,),
+            )
+        ).fetchall()
+
+        return bought_premium[0][0]
+
+    async def get_date_purchase(self, telegram_id):
+        date_purchase = await (
+            await self.cur.execute(
+                """SELECT date_purchase FROM `premium_user` WHERE telegram_id = ?""",
+                (telegram_id,),
+            )
+        ).fetchall()
+
+        return date_purchase[0][0]
+
+    async def add_premium_user(self, telegram_id):
+        is_premium = await (
+            await self.cur.execute(
+                """SELECT COUNT(`telegram_id`) FROM `premium_user` WHERE telegram_id = ? AND is_premium = ?""",
+                (telegram_id, 1),
+            )
+        ).fetchall()
+
+        bought_premium = await (
+            await self.cur.execute(
+                """SELECT bought_premium FROM `premium_user` WHERE telegram_id = ?""",
+                (telegram_id,),
+            )
+        ).fetchall()
+
+        expiration_date = await (
+            await self.cur.execute(
+                """SELECT expiration_date FROM `premium_user` WHERE telegram_id = ?""",
+                (telegram_id,),
+            )
+        ).fetchall()
+
+        # VARIABLES
+        current_datetime = (datetime.now()).strftime("%d.%m.%Y")
+        next_month = (datetime.now() + relativedelta(months=1)).strftime("%d.%m.%Y")
+
+        if not bool(is_premium[0][0]):
+            await self.cur.execute(
+                """INSERT INTO premium_user(
+                                      telegram_id, is_premium, expiration_date,
+                                      bought_premium, date_purchase)
+                                      VALUES (?,?,?,?,?)
+                                      """,
+                (
+                    telegram_id,
+                    1,
+                    next_month,
+                    1,
+                    current_datetime,
+                ),
+            )
+            return await self.base.commit()
+
+        continue_data = (
+            datetime.strptime(expiration_date[0][0], "%d.%m.%Y")
+            + relativedelta(months=1)
+        ).strftime("%d.%m.%Y")
+        await self.cur.execute(
+            """UPDATE premium_user
+                                  SET expiration_date = ?, 
+                                  bought_premium = ?, 
+                                  date_purchase = ?
+                                  WHERE telegram_id = ?;
+                                  """,
+            (
+                continue_data,
+                bought_premium[0][0] + 1,
+                current_datetime,
+                telegram_id,
+            ),
+        )
+        return await self.base.commit()
+
+    async def is_premium_user(self, telegram_id):
+        result = await (
+            await self.cur.execute(
+                """SELECT COUNT(`telegram_id`) 
+                                                  FROM `premium_user` 
+                                                  WHERE `telegram_id` = ? AND `is_premium` = ?""",
+                (
+                    telegram_id,
+                    1,
+                ),
+            )
+        ).fetchall()
         return bool(result[0][0])

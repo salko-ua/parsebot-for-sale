@@ -1,12 +1,14 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-def buy_premium_kb() -> InlineKeyboardMarkup:
+
+def buy_premium_kb(chose: bool) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
-    keyboard = [
-        "Придбати підписку 💳"
-    ]
+    if chose:
+        keyboard = ["Продовжити підписку 💳"]
+    else:
+        keyboard = ["Придбати підписку 💳"]
 
     for button in keyboard:
         builder.add(InlineKeyboardButton(text=button, callback_data=button))
