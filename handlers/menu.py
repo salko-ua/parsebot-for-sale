@@ -22,6 +22,7 @@ async def information(message: Message):
         f"Купував підписку: {bought_premium} раз\n\n"
         f"Дія підписки: <b>{date_purchase}-{expiration_date}</b>"
     )
+    
     await message.answer(text, parse_mode="HTML")
 
 
