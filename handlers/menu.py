@@ -20,6 +20,11 @@ async def information(message: Message):
         parse_mode="HTMl",
         disable_web_page_preview=True,
     )
+    await message.answer(
+        r"""<b><a href = "https://telegra.ph/DOGOV%D0%86R-OFERTI-12-20">Договір Оферти</a></b>""",
+        parse_mode="HTMl",
+        disable_web_page_preview=True,
+    )
 
 
 @router.message(F.text == "Підписка 👑")
