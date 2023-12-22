@@ -107,18 +107,24 @@ class Information:
         price = soup.find("h2", text=re.compile(r".*грн.*"))
 
         if not price:
+            price = soup.find("h2", text=re.compile(r".*\$.*"))
+
+        if not price:
             price = soup.find("h3", text=re.compile(r".*грн.*"))
+
+        if not price:
+            price = soup.find("h3", text=re.compile(r".*\$.*"))
 
         if not price:
             price = soup.find("h4", text=re.compile(r".*грн.*"))
 
         if not price:
-            return "Суму не знайдено", "#0грн"
+            price = soup.find("h4", text=re.compile(r".*\$.*"))
 
-        without_space = "".join(price.text.split())
-        price = int((re.search(r"\d+", without_space)).group())
+        if not price:
+            return "Суму не знайдено"
 
-        return price
+        return price.text
 
     def get_header(soup: BeautifulSoup) -> [str, str]:
         # parsing caption from the page
@@ -153,9 +159,9 @@ class Information:
             f"🏢Поверх: {flour}\n"
             f"🔑Площа: {area}м2\n"
             f"📍Район: {district}\n"
-            f"💳️{money} грн"
+            f"💳️{money}"
             f"\n\n{header}\n\n"
-            f"📝Опис: {caption}"
+            f"📝Опис:\n{caption}"
         )
 
         return main_caption

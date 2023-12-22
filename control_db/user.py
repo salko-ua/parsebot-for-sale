@@ -6,8 +6,8 @@ class UserDB(BaseDBPart):
         result = await (
             await self.cur.execute(
                 """SELECT COUNT(`telegram_id`) 
-                                         FROM `user` 
-                                         WHERE `telegram_id` = ?""",
+                    FROM `user` 
+                    WHERE `telegram_id` = ?""",
                 (telegram_id,),
             )
         ).fetchall()

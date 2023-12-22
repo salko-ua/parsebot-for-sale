@@ -1,15 +1,23 @@
 from control_db.create_db import BaseDBPart
 from datetime import datetime
-from datetime import date
 from dateutil.relativedelta import relativedelta
 
 
 class PremiumUser(BaseDBPart):
-    async def telegram_id_exists(self, telegram_id):
+    async def telegram_id_premium_exists(self, telegram_id):
         result = await (
             await self.cur.execute(
                 """SELECT COUNT(`telegram_id`) FROM `premium_user` WHERE `telegram_id` = ?""",
                 (telegram_id,),
+            )
+        ).fetchall()
+        return bool(result[0][0])
+
+    async def is_premium_user(self, telegram_id):
+        result = await (
+            await self.cur.execute(
+                """SELECT COUNT(`telegram_id`) FROM `premium_user` WHERE `telegram_id` = ? AND `is_premium` = ?""",
+                (telegram_id, 1),
             )
         ).fetchall()
         return bool(result[0][0])
@@ -45,7 +53,7 @@ class PremiumUser(BaseDBPart):
         return date_purchase[0][0]
 
     async def add_premium_user(self, telegram_id):
-        is_premium = await (
+        telegram_id_exists = await (
             await self.cur.execute(
                 """SELECT COUNT(`telegram_id`) FROM `premium_user` WHERE telegram_id = ? AND is_premium = ?""",
                 (telegram_id, 1),
@@ -70,20 +78,10 @@ class PremiumUser(BaseDBPart):
         current_datetime = (datetime.now()).strftime("%d.%m.%Y")
         next_month = (datetime.now() + relativedelta(months=1)).strftime("%d.%m.%Y")
 
-        if not bool(is_premium[0][0]):
+        if not bool(telegram_id_exists[0][0]):
             await self.cur.execute(
-                """INSERT INTO premium_user(
-                                      telegram_id, is_premium, expiration_date,
-                                      bought_premium, date_purchase)
-                                      VALUES (?,?,?,?,?)
-                                      """,
-                (
-                    telegram_id,
-                    1,
-                    next_month,
-                    1,
-                    current_datetime,
-                ),
+                """INSERT INTO premium_user(telegram_id, is_premium, expiration_date, bought_premium, date_purchase) VALUES (?,?,?,?,?)""",
+                (telegram_id, 1, next_month, 1, current_datetime),
             )
             return await self.base.commit()
 
@@ -91,32 +89,9 @@ class PremiumUser(BaseDBPart):
             datetime.strptime(expiration_date[0][0], "%d.%m.%Y")
             + relativedelta(months=1)
         ).strftime("%d.%m.%Y")
+
         await self.cur.execute(
-            """UPDATE premium_user
-                                  SET expiration_date = ?, 
-                                  bought_premium = ?, 
-                                  date_purchase = ?
-                                  WHERE telegram_id = ?;
-                                  """,
-            (
-                continue_data,
-                bought_premium[0][0] + 1,
-                current_datetime,
-                telegram_id,
-            ),
+            """UPDATE premium_user SET expiration_date = ?, bought_premium = ?, date_purchase = ? WHERE telegram_id = ?; """,
+            (continue_data, (bought_premium[0][0] + 1), current_datetime, telegram_id),
         )
         return await self.base.commit()
-
-    async def is_premium_user(self, telegram_id):
-        result = await (
-            await self.cur.execute(
-                """SELECT COUNT(`telegram_id`) 
-                                                  FROM `premium_user` 
-                                                  WHERE `telegram_id` = ? AND `is_premium` = ?""",
-                (
-                    telegram_id,
-                    1,
-                ),
-            )
-        ).fetchall()
-        return bool(result[0][0])

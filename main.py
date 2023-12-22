@@ -1,13 +1,15 @@
 import asyncio, logging
 from aiogram import Bot, Dispatcher
 from config import TOKEN
-from handlers import telegram, menu
+from handlers import parsing, menu, payments, telegram
 
 bot = Bot(token=TOKEN, parse_mode="HTML")
 dp = Dispatcher()
 
 
 async def register_handlers():
+    dp.include_router(payments.router)
+    dp.include_router(parsing.router)
     dp.include_router(menu.router)
     dp.include_router(telegram.router)
 

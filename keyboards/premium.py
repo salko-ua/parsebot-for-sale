@@ -14,3 +14,14 @@ def buy_premium_kb(chose: bool) -> InlineKeyboardMarkup:
         builder.add(InlineKeyboardButton(text=button, callback_data=button))
 
     return builder.adjust(2).as_markup(resize_keyboard=True)
+
+
+def back() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    keyboard = ["Відмінити ❌"]
+
+    for button in keyboard:
+        builder.add(InlineKeyboardButton(text=button, callback_data=button))
+
+    return builder.adjust(2).as_markup(resize_keyboard=True)
