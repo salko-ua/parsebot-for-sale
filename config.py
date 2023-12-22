@@ -1,4 +1,4 @@
 import os
 
-TOKEN = os.environ["TEST_TOKEN"]
+TOKEN = os.environ["TOKEN"]
 PROVIDER_TOKEN = os.environ["PROVIDER_TOKEN"]
