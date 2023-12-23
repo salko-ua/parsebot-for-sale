@@ -1,5 +1,6 @@
 from aiogram import F, Router, Bot
 from aiogram.types import Message, CallbackQuery
+from aiogram.filters import Command
 from control_db import Database
 from aiogram.filters.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
@@ -13,6 +14,7 @@ class SendFAQ(StatesGroup):
     send_message = State()
 
 
+@router.message(Command("about"))
 @router.message(F.text == "Інформація 🧾")
 async def information(message: Message):
     await message.answer(
