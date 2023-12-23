@@ -15,6 +15,28 @@ def menu() -> ReplyKeyboardMarkup:
     return builder.adjust(2).as_markup(resize_keyboard=True)
 
 
+def about(without: str = "") -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    keyboard = [
+        "Політика конфід. 🔐",
+        "Договір Оферти 📑",
+        "Тариф 💸",
+        "Про нас 👥",
+        "Поради користування ❤️",
+        "Контакти 📱",
+        "Сховати ❌",
+    ]
+
+    # if without != "":
+    #     keyboard.remove(without)
+
+    for button in keyboard:
+        builder.add(InlineKeyboardButton(text=button, callback_data=button))
+
+    return builder.adjust(2).as_markup(resize_keyboard=True)
+
+
 def hide_kb() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
