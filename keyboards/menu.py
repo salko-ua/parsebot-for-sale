@@ -57,3 +57,14 @@ def continue_premium() -> InlineKeyboardMarkup:
         builder.add(InlineKeyboardButton(text=button, callback_data=button))
 
     return builder.adjust(1).as_markup(resize_keyboard=True)
+
+
+def buy_premium() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    keyboard = ["Придбати підписку 💳", "Сховати ❌"]
+
+    for button in keyboard:
+        builder.add(InlineKeyboardButton(text=button, callback_data=button))
+
+    return builder.adjust(1).as_markup(resize_keyboard=True)

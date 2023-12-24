@@ -6,9 +6,9 @@ def buy_premium_kb(chose: bool) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     if chose:
-        keyboard = ["Продовжити підписку 💳"]
+        keyboard = ["Продовжити підписку 💳", "Сховати ❌"]
     else:
-        keyboard = ["Придбати підписку 💳"]
+        keyboard = ["Придбати підписку 💳", "Сховати ❌"]
 
     for button in keyboard:
         builder.add(InlineKeyboardButton(text=button, callback_data=button))

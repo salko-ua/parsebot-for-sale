@@ -29,7 +29,7 @@ async def start(message: Message):
         await message.answer(
             f"👋 Привіт, підписка активна до {expiration_date}\n"
             "Бажаєте подовжити вашу підписку?",
-            reply_markup=buy_premium_kb(True),
+            reply_markup=menu(),
             disable_web_page_preview=True,
         )
         return
@@ -39,7 +39,7 @@ async def start(message: Message):
         "про здачу квартири в оренду з сайту olx.ua\n\n"
         "Для того щоб користуватися моїми послугами\n"
         "ви повинні придбати платну підписку ⬇️\n",
-        reply_markup=buy_premium_kb(False),
+        reply_markup=menu(),
         disable_web_page_preview=True,
     )
 

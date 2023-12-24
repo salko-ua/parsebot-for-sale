@@ -65,14 +65,20 @@ class Information:
                 if need_word in tag.text:
                     checklist.append(tag.text)
 
-        find_rooms = re.search(r"\d+", checklist[0])
-        find_area = re.search(r"\d+", checklist[1])
-        find_have = re.search(r"\d+", checklist[2])
-        find_everything = re.search(r"\d+", checklist[3])
+        if len(checklist) != 4:
+            find_rooms = re.search(r"\d+", checklist[0])
+            find_area = re.search(r"\d+", checklist[1])
+            find_everything = re.search(r"\d+", checklist[2])
+            flour = f"{find_everything.group()}"
+        else:
+            find_rooms = re.search(r"\d+", checklist[0])
+            find_area = re.search(r"\d+", checklist[1])
+            find_have = re.search(r"\d+", checklist[2])
+            find_everything = re.search(r"\d+", checklist[3])
+            flour = f"{find_have.group()} з {find_everything.group()}"
 
         rooms = find_rooms.group()
         area = find_area.group()
-        flour = f"{find_have.group()} з {find_everything.group()}"
 
         # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -126,6 +132,17 @@ class Information:
 
         return price.text
 
+    def delete_words(text: str, words_to_remove: list) -> str:
+        # Використовуємо регулярний вираз для визначення слова з можливими крапками
+        pattern = re.compile(
+            r"\b(?:" + "|".join(map(re.escape, words_to_remove)) + r")\b", re.IGNORECASE
+        )
+
+        # Замінюємо відповідні слова на порожні рядки
+        result = pattern.sub("", text)
+
+        return result
+
     def get_header(soup: BeautifulSoup) -> [str, str]:
         # parsing caption from the page
         header = soup.find("h4", class_="css-1juynto")
@@ -148,8 +165,52 @@ class Information:
         return caption.text
 
     def create_caption(soup: BeautifulSoup) -> str:
-        caption = Information.get_caption(soup)
-        header = Information.get_header(soup)
+        words = [
+            "Від",
+            "От",
+            "я собственник",
+            "я власнник",
+            "посредников",
+            "своя",
+            "свою",
+            "риелтор",
+            "риелторов",
+            "агентство",
+            "агент",
+            "маклер",
+            "посредник",
+            "личную",
+            "хозяин",
+            "собственник",
+            "собственника",
+            "хозяина",
+            "хозяйка",
+            "без комиссии",
+            "агента",
+            "агентства",
+            "собственников",
+            "посередників",
+            "своя",
+            "свою",
+            "ріелтор",
+            "ріелторів",
+            "агентство",
+            "агент",
+            "маклер",
+            "посередник",
+            "посередник",
+            "особисту",
+            "власник",
+            "власника",
+            "власників",
+            "хазяїнахазяйка",
+            "хазяйка",
+            "особисту",
+            "без комісії",
+        ]
+
+        caption = Information.delete_words(Information.get_caption(soup), words)
+        header = Information.delete_words(Information.get_header(soup), words)
 
         rooms, flour, area, district = Information.get_main_information(soup)
         money = Information.get_price(soup)
@@ -175,5 +236,8 @@ async def get_data(message: types.Message):
 
     message_photo = await message.answer_media_group(media=photo_group)
     await bot.edit_message_caption(
-        message_id=message_photo[0].message_id, chat_id=message.chat.id, caption=caption
+        message_id=message_photo[0].message_id,
+        chat_id=message.chat.id,
+        caption=caption,
+        parse_mode="HTML",
     )

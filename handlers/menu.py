@@ -5,7 +5,7 @@ from control_db import Database
 from aiogram.filters.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from keyboards.premium import back
-from keyboards.menu import hide_kb, continue_premium, about
+from keyboards.menu import hide_kb, continue_premium, about, buy_premium
 
 router = Router()
 
@@ -107,7 +107,10 @@ async def about_information(query: CallbackQuery):
         "\n"
         "5.3. Зміни і доповнення до цього Договору мають бути внесені в письмовій формі та підписані обома сторонами.\n"
         "\n"
-        "6. Реквізити сторін:\n"
+        "6. Повернення коштів.\n"
+        "При виникненні непередбачуваних ситуацій або форс-мажорів, кошти за підписку на Telegram-бот не повертаються.\n"
+        "\n"
+        "7. Реквізити сторін:\n"
         "\n"
         "Продавець:\n"
         "ФОП Магировська Марія Тарасівна\n"
@@ -172,7 +175,7 @@ async def premium(message: Message):
                 f"Підписка: не активна ❌\n"
                 f"Купував підписку: 0 раз"
             ),
-            reply_markup=hide_kb(),
+            reply_markup=buy_premium(),
         )
         return
 

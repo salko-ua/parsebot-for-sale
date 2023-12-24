@@ -4,6 +4,7 @@ from control_db import Database
 from keyboards.menu import menu, continue_premium
 from aiogram import Bot, Router, F
 from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery
+from datetime import date
 
 
 router = Router()
@@ -47,7 +48,14 @@ async def buy_premium(query: CallbackQuery, bot: Bot):
 
 @router.pre_checkout_query()
 async def pre_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: Bot):
+    data_operation = date.today()
+    db = await Database.setup()
     await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
+    await db.add_premium_operations(
+        pre_checkout_query.from_user.id,
+        data_operation=data_operation,
+        price=pre_checkout_query.total_amount,
+    )
 
 
 @router.message(F.successful_payment)
