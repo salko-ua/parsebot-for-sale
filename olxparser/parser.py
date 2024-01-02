@@ -1,9 +1,11 @@
-from ast import Await
 import re
+from ast import Await
+
 import requests
-from main import bot
 from aiogram import types
 from bs4 import BeautifulSoup
+
+from main import bot
 
 
 def get_url(url):

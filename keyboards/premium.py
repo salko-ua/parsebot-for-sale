@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
@@ -14,6 +14,20 @@ def buy_premium_kb(chose: bool) -> InlineKeyboardMarkup:
         builder.add(InlineKeyboardButton(text=button, callback_data=button))
 
     return builder.adjust(2).as_markup(resize_keyboard=True)
+
+
+def buy_url(url: str, order_reference: str) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    builder.add(InlineKeyboardButton(text="Оплатити", url=url))
+    builder.add(
+        InlineKeyboardButton(
+            text="Передумав ❌",
+            callback_data=f"Передумав ❌{order_reference}",
+        )
+    )
+
+    return builder.adjust(1).as_markup(resize_keyboard=True)
 
 
 def back() -> InlineKeyboardMarkup:

@@ -1,10 +1,11 @@
 import datetime
-from aiogram import F, Router, Bot
-from aiogram.types import Message, CallbackQuery
+
+from aiogram import F, Router
 from aiogram.filters import Command
+from aiogram.types import CallbackQuery, Message
+
 from control_db import Database
-from keyboards.premium import buy_premium_kb
-from keyboards.menu import menu
+from keyboards.menu import menu_kb
 
 router = Router()
 
@@ -29,17 +30,20 @@ async def start(message: Message):
         await message.answer(
             f"👋 Привіт, підписка активна до {expiration_date}\n"
             "Бажаєте подовжити вашу підписку?",
-            reply_markup=menu(),
+            reply_markup=menu_kb(),
             disable_web_page_preview=True,
         )
         return
 
     await message.answer(
-        "Привіт, я парсер для створення постів\n"
-        "про здачу квартири в оренду з сайту olx.ua\n\n"
+        "Привіт, я парсер для створення постів з сайту olx.ua\n"
         "Для того щоб користуватися моїми послугами\n"
-        "ви повинні придбати платну підписку ⬇️\n",
-        reply_markup=menu(),
+        "ви повинні придбати платну підписку ⬇️\n\n"
+        "Також ви можете спробувати бота без підписки\n"
+        "Для цього ви повинні надіслати йому посилання\n"
+        "У вас є всього одне тестове посилання\n"
+        "Яке буде використанно, далі потрібно придбати підписку\n",
+        reply_markup=menu_kb(),
         disable_web_page_preview=True,
     )
 
@@ -47,7 +51,7 @@ async def start(message: Message):
 @router.message(Command("keyboard"))
 async def keyboard(message: Message):
     await message.delete()
-    await message.answer("⬇️ Ваша панель з кнопками ⬇️", reply_markup=menu())
+    await message.answer("⬇️ Ваша панель з кнопками ⬇️", reply_markup=menu_kb())
 
 
 @router.callback_query(F.data == "Сховати ❌")

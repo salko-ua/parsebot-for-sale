@@ -1,11 +1,12 @@
-from aiogram import F, Router, Bot
-from aiogram.types import Message, CallbackQuery
+from aiogram import Bot, F, Router
 from aiogram.filters import Command
-from control_db import Database
-from aiogram.filters.state import StatesGroup, State
+from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
+from aiogram.types import CallbackQuery, Message
+
+from control_db import Database
+from keyboards.menu import about, buy_premium, continue_premium, hide_kb
 from keyboards.premium import back
-from keyboards.menu import hide_kb, continue_premium, about, buy_premium
 
 router = Router()
 
@@ -255,7 +256,7 @@ async def faq_back(message: Message, state: FSMContext, bot: Bot):
 
     await state.clear()
     text_from_user = (
-        f"Користувач {message.from_user.id}\n"
+        f"Користувач @{message.from_user.username} {message.from_user.id}\n"
         "Надіслав повідомлення: \n"
         f"{message.text}"
     )

@@ -1,11 +1,12 @@
 import os
-import asyncache
-import aiosqlite
 
-from control_db.user import UserDB
-from control_db.urls import UrlsDB
-from control_db.premium_user import PremiumUser
+import aiosqlite
+import asyncache
+
 from control_db.premium_operations import PremiumOperations
+from control_db.premium_user import PremiumUser
+from control_db.urls import UrlsDB
+from control_db.user import UserDB
 
 
 class Database(UserDB, UrlsDB, PremiumOperations, PremiumUser):
@@ -27,6 +28,7 @@ class Database(UserDB, UrlsDB, PremiumOperations, PremiumUser):
                 telegram_id       INTEGER NOT NULL, 
                 first_name        TEXT,     -- ім`я
                 username          TEXT,     -- особливе ім`я
+                parsing_post      INTEHER DEFAULT 0,
                 date_join         TEXT     -- дата коли перший раз написав боту
             )
             """
@@ -45,9 +47,13 @@ class Database(UserDB, UrlsDB, PremiumOperations, PremiumUser):
         await base.execute(
             """
             CREATE TABLE IF NOT EXISTS premium_operations(
-                telegram_id       INTEGER NOT NULL, 
-                data_operation    TEXT,
-                price             INTEGER
+                telegram_id       INTEGER NOT NULL,
+                message_id        INTEHER NOT NULL,
+                order_date        FLOAT NOT NULL,
+                order_reference   TEXT NOT NULL,
+                reason_code       INTEGER DEFAULT 1151,
+                transaction_status TEXT,
+                price             INTEGER DEFAULT 300
             )
             """
         )

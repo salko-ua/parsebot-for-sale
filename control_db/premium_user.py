@@ -1,6 +1,8 @@
-from control_db.create_db import BaseDBPart
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from control_db.create_db import BaseDBPart
+from typing import Iterable
+from aiosqlite import Row
 
 
 class PremiumUser(BaseDBPart):
@@ -12,6 +14,21 @@ class PremiumUser(BaseDBPart):
             )
         ).fetchall()
         return bool(result[0][0])
+
+    async def get_count_premium_user(self, is_premium: int):
+        result = await (
+            await self.cur.execute(
+                """SELECT COUNT(`telegram_id`) FROM `premium_user` WHERE is_premium = ?""",
+                (is_premium,),
+            )
+        ).fetchall()
+        return result[0][0]
+
+    async def get_all_premium_telegram_id(self):
+        result = await (
+            await self.cur.execute("SELECT `telegram_id` FROM premium_user")
+        ).fetchall()
+        return result
 
     async def is_premium_user(self, telegram_id):
         result = await (
@@ -95,3 +112,11 @@ class PremiumUser(BaseDBPart):
             (continue_data, (bought_premium[0][0] + 1), current_datetime, telegram_id),
         )
         return await self.base.commit()
+
+    async def get_all_premium_user(self) -> Iterable[Row]:
+        cursor = await self.cur.execute(
+            "SELECT telegram_id, expiration_date FROM premium_user"
+        )
+        rows = await cursor.fetchall()
+
+        return rows

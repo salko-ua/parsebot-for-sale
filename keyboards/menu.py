@@ -1,10 +1,9 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.types import (InlineKeyboardButton, InlineKeyboardMarkup,
+                           KeyboardButton, ReplyKeyboardMarkup)
+from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 
-def menu() -> ReplyKeyboardMarkup:
+def menu_kb() -> ReplyKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
 
     keyboard = ["Інформація 🧾", "Підписка 👑", "Посилання 🔗", "FAQ 👤"]
