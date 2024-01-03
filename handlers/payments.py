@@ -119,6 +119,7 @@ async def create_payment(
                 "notifyMethod": "bot",
                 "orderReference": order_reference,
                 "orderDate": order_date,
+                "alternativeAmount": 350,
                 "amount": amount,
                 "currency": currency,
                 "productName": list(product_name),
@@ -165,11 +166,11 @@ async def get_payment_info(order_reference: str, merchant_account: str) -> Check
 @router.callback_query(F.data == "Придбати підписку 💳")
 async def payment(query: CallbackQuery):
     db = await Database.setup()
-    amount = 1
+    amount = 300
     currency = "UAH"
     product_name = ("Місячна підписка", "Комісія")
     product_count = (int(1), int(1))
-    product_price = (int(10), int(0))
+    product_price = (int(300), int(0))
     order_reference = generate_random_string(12)
     order_date = int(datetime.now().replace(hour=0, minute=0, second=0).timestamp())
 
@@ -234,7 +235,7 @@ async def check_status_invoice(
         await bot.send_message(
             chat_id=-1001902595324,
             message_thread_id=392,
-            text=f"Оплата пройшла успішно\nКод оплати {response.reason_code}\nКод підписки {reference}",
+            text=f"Оплата пройшла успішно @{await db.get_username(telegram_id)} {telegram_id}\nКод оплати {response.reason_code}\nКод підписки {reference}",
         )
 
         # [N] CHECK NEW OR OLD USER AND SEND NOTIFY
@@ -273,7 +274,7 @@ async def check_status_invoice(
         await bot.send_message(
             chat_id=-1001902595324,
             message_thread_id=392,
-            text=f"Оплата провалилась\nКод оплати {response.reason_code}\nКод підписки {reference}",
+            text=f"Оплата провалилась @{await db.get_username(telegram_id)} {telegram_id}\nКод оплати {response.reason_code}\nКод підписки {reference}",
         )
 
         # [N] SEND NOTIFY

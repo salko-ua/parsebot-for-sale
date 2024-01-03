@@ -1,12 +1,16 @@
-from aiogram.types import (InlineKeyboardButton, InlineKeyboardMarkup,
-                           KeyboardButton, ReplyKeyboardMarkup)
+from aiogram.types import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    KeyboardButton,
+    ReplyKeyboardMarkup,
+)
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 
 def menu_kb() -> ReplyKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
 
-    keyboard = ["Інформація 🧾", "Підписка 👑", "Посилання 🔗", "FAQ 👤"]
+    keyboard = ["Інформація 🧾", "Підписка 👑", "Посилання 🔗", "Зворт зв`язок 👤"]
 
     for button in keyboard:
         builder.add(KeyboardButton(text=button, callback_data=button))
@@ -14,7 +18,7 @@ def menu_kb() -> ReplyKeyboardMarkup:
     return builder.adjust(2).as_markup(resize_keyboard=True)
 
 
-def about(without: str = "") -> InlineKeyboardMarkup:
+def about() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     keyboard = [
@@ -26,9 +30,6 @@ def about(without: str = "") -> InlineKeyboardMarkup:
         "Контакти 📱",
         "Сховати ❌",
     ]
-
-    # if without != "":
-    #     keyboard.remove(without)
 
     for button in keyboard:
         builder.add(InlineKeyboardButton(text=button, callback_data=button))

@@ -13,6 +13,17 @@ class UserDB(BaseDBPart):
         ).fetchall()
         return bool(result[0][0])
 
+    async def get_username(self, telegram_id):
+        result = await (
+            await self.cur.execute(
+                """SELECT username
+                    FROM `user` 
+                    WHERE `telegram_id` = ?""",
+                (telegram_id,),
+            )
+        ).fetchall()
+        return result[0][0]
+
     async def get_count_users(self):
         result = await (
             await self.cur.execute("SELECT COUNT(`telegram_id`) FROM `user`")

@@ -70,6 +70,6 @@ async def create_tasks():
     scheduler.add_job(
         check_all_invoice, "interval", seconds=10, id="check_all_invoice", args=(lock,)
     )
-    # scheduler.add_job(
-    #     check_all_premium, "interval", seconds=15, id="check_all_premium", args=(lock,)
-    # )
+    scheduler.add_job(
+        check_all_premium, "cron", hour=7, id="check_all_premium", args=(lock,)
+    )
