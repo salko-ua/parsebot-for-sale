@@ -45,25 +45,21 @@ async def people_ex(message: Message):
     if not message.from_user.id in ADMINS:
         return
 
-    try:
-        db = await Database.setup()
-        all_users = await db.get_all_user()
-        premium_users = await db.get_all_premium_telegram_id()
+    db = await Database.setup()
+    all_users = await db.get_all_user()
+    premium_users = await db.get_all_premium_telegram_id()
+    new = "Користувачі які ні разу не купували преміум:"
 
-        new = "Користувачі які ні разу не купували преміум:"
-        for telegram_id, username, date_join in all_users[0]:
-            if telegram_id not in premium_users[0]:
-                data = datetime.strptime(date_join, "%d.%m.%Y %H:%M")
-                formatted_date = data.strftime("%d.%m.%Y %H:%M")
-                new += f"\nІм`я: @{username}\nID: {telegram_id}\nДата приєднання{formatted_date}"
-        await message.answer(new)
-    except Exception as exeception:
-        text_for_admin = (
-            f"У користувача {telegram_id} сталася помилка\n"
-            f"Details: {exeception}\n"
-            f"TraceBack: \n\n{traceback.format_exc()}\n"
-        )
-        await bot.send_message(chat_id=2138964363, text=text_for_admin)
+    print(all_users)
+    print(premium_users)
+    for telegram_id, username, date_join in all_users:
+        if telegram_id not in premium_users[0]:
+            date_join = datetime.strptime(date_join, "%Y-%m-%d %H:%M:%S.%f")
+            formatted_date = date_join.strftime("%Y-%m-%d %H:%M")
+            new += (
+                f"\nІм`я: @{username}\nID: {telegram_id}\nПриєднався:{formatted_date}\n"
+            )
+    await message.answer(new)
 
 
 @router.message(F.text == "Статистика 📊")
