@@ -40,26 +40,84 @@ async def admin(message: Message):
         await message.answer("Ось ваша клавіатура ⬇️", reply_markup=admin_kb())
 
 
-@router.message(F.text == "Люди 👥")
+@router.message(F.text == "Всі Користувачі 👥")
+async def all_people_from_db(message: Message):
+    if not message.from_user.id in ADMINS:
+        return
+    await message.delete()
+
+    db = await Database.setup()
+    all_users = await db.get_all_user()
+    text = "Всі Користувачі 👥"
+    for telegram_id, first_name, username, parsing_post, date_join in all_users:
+        text += f"\nID: {telegram_id}"
+        text += f"\nІм`я: {first_name}"
+        text += f"\nПсевдонім: {username}"
+        text += f"\nСтворив постів: {parsing_post}"
+        text += f"\nПриєднався: {date_join}\n\n"
+    try:
+        await message.answer(text, reply_markup=hide_kb())
+    except:
+        await message.answer(
+            "Тексту забагато напишіть розробнику що він болван і досі не зробив адаптацію до великого тексту",
+            reply_markup=hide_kb(),
+        )
+
+
+@router.message(F.text == "Всі Кориистувачі 👑")
+async def all_premium_from_db(message: Message):
+    if not message.from_user.id in ADMINS:
+        return
+    await message.delete()
+
+    db = await Database.setup()
+    all_premium = await db.get_all_premium()
+    text = "Всі користувачі 👑"
+    for (
+        telegram_id,
+        is_premium,
+        expiration_date,
+        bought_premium,
+        date_purchase,
+    ) in all_premium:
+        text += f"\nID: {telegram_id}"
+        text += f"\nПреміум: {'активний' if is_premium else 'не активний'}"
+        text += f"\nПокупок: {bought_premium}"
+        text += f"\nКупив\Продовжив: {date_purchase}"
+        text += f"\nДіє до: {expiration_date}\n\n"
+    try:
+        await message.answer(text, reply_markup=hide_kb())
+    except:
+        await message.answer(
+            "Тексту забагато напишіть розробнику що він болван і досі не зробив адаптацію до великого тексту",
+            reply_markup=hide_kb(),
+        )
+
+
+@router.message(F.text == "Користувачі що не мали 👑")
 async def people_ex(message: Message):
     if not message.from_user.id in ADMINS:
         return
+    await message.delete()
 
     db = await Database.setup()
     all_users = await db.get_all_user()
     premium_users = await db.get_all_premium_telegram_id()
-    new = "Користувачі які ні разу не купували преміум:"
+    premium_users = [item[0] for item in premium_users]
+    new = "Користувачі, що не купували 👑:"
 
-    print(all_users)
-    print(premium_users)
-    for telegram_id, username, date_join in all_users:
-        if telegram_id not in premium_users[0]:
+    for telegram_id, _, username, parsing_post, date_join in all_users:
+        if telegram_id not in premium_users:
             date_join = datetime.strptime(date_join, "%Y-%m-%d %H:%M:%S.%f")
             formatted_date = date_join.strftime("%Y-%m-%d %H:%M")
-            new += (
-                f"\nІм`я: @{username}\nID: {telegram_id}\nПриєднався:{formatted_date}\n"
-            )
-    await message.answer(new)
+            new += f"\nІм`я: @{username}\nID: {telegram_id}\nВикористав тест: {'так' if parsing_post > 0 else 'ні'}\nПриєднався: {formatted_date}\n"
+    try:
+        await message.answer(new, reply_markup=hide_kb())
+    except:
+        await message.answer(
+            "Тексту забагато напишіть розробнику що він болван і досі не зробив адаптацію до великого тексту",
+            reply_markup=hide_kb(),
+        )
 
 
 @router.message(F.text == "Статистика 📊")

@@ -32,6 +32,10 @@ class PremiumUser(BaseDBPart):
         ).fetchall()
         return result
 
+    async def get_all_premium(self):
+        result = await (await self.cur.execute("SELECT * FROM premium_user")).fetchall()
+        return result
+
     async def is_premium_user(self, telegram_id):
         result = await (
             await self.cur.execute(
