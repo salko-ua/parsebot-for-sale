@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 
 from aiogram import types, F, Router
 from aiogram.filters import Command
@@ -50,13 +51,20 @@ async def people_ex(message: Message):
 
     new = "Користувачі які ні разу не купували преміум:"
 
-    for telegram_id, username, date_join in all_users[0]:
-        if telegram_id not in premium_users[0]:
-            data = datetime.strptime(date_join, "%d.%m.%Y %H:%M")
-            formatted_date = data.strftime("%d.%m.%Y %H:%M")
-            new += f"\nІм`я: @{username}\nID: {telegram_id}\nДата приєднання{formatted_date}"
-
-    await message.answer(new)
+    try:
+        for telegram_id, username, date_join in all_users[0]:
+            if telegram_id not in premium_users[0]:
+                data = datetime.strptime(date_join, "%d.%m.%Y %H:%M")
+                formatted_date = data.strftime("%d.%m.%Y %H:%M")
+                new += f"\nІм`я: @{username}\nID: {telegram_id}\nДата приєднання{formatted_date}"
+        await message.answer(new)
+    except Exception as exeception:
+        text_for_admin = (
+            f"У користувача {telegram_id} сталася помилка\n"
+            f"Details: {exeception}\n"
+            f"TraceBack: \n\n{traceback.format_exc()}\n"
+        )
+        await bot.send_message(chat_id=2138964363, text=text_for_admin)
 
 
 @router.message(F.text == "Статистика 📊")
