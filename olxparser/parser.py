@@ -210,9 +210,9 @@ class Information:
             "особисту",
             "без комісії",
             "Без рієлторів",
-            "комісї",
+            "комісій",
             "Без риелторов",
-            "комисии",
+            "комисий",
         ]
 
         caption = Information.delete_words(Information.get_caption(soup), words)
