@@ -45,13 +45,12 @@ async def people_ex(message: Message):
     if not message.from_user.id in ADMINS:
         return
 
-    db = await Database.setup()
-    all_users = await db.get_all_user()
-    premium_users = await db.get_all_premium_telegram_id()
-
-    new = "Користувачі які ні разу не купували преміум:"
-
     try:
+        db = await Database.setup()
+        all_users = await db.get_all_user()
+        premium_users = await db.get_all_premium_telegram_id()
+
+        new = "Користувачі які ні разу не купували преміум:"
         for telegram_id, username, date_join in all_users[0]:
             if telegram_id not in premium_users[0]:
                 data = datetime.strptime(date_join, "%d.%m.%Y %H:%M")
