@@ -56,7 +56,7 @@ async def people_ex(message: Message):
             formatted_date = data.strftime("%d.%m.%Y %H:%M")
             new += f"\nІм`я: @{username}\nID: {telegram_id}\nДата приєднання{formatted_date}"
 
-    await message.answer()
+    await message.answer(new)
 
 
 @router.message(F.text == "Статистика 📊")
