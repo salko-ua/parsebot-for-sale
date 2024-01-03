@@ -15,7 +15,7 @@ def admin_kb() -> ReplyKeyboardMarkup:
     for button in keyboard:
         builder.add(KeyboardButton(text=button, callback_data=button))
 
-    return builder.adjust(3).as_markup(resize_keyboard=True)
+    return builder.adjust(1).as_markup(resize_keyboard=True)
 
 
 def send_alarm() -> InlineKeyboardMarkup:
