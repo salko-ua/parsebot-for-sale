@@ -1,6 +1,6 @@
 import asyncio
 
-from aiogram import Bot, F, Router
+from aiogram import types, F, Router
 from aiogram.filters import Command
 from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -20,6 +20,15 @@ class SendNews(StatesGroup):
     send_message_finish = State()
     send_news_users = State()
     send_news_premium = State()
+
+
+@router.message(F.text == "db")
+async def send_file_db(message: Message):
+    if not (message.from_user.id in ADMINS):
+        return
+
+    file_path = types.FSInputFile("data/database.db")
+    await bot.send_document(message.from_user.id, file_path)
 
 
 @router.message(Command("admin"))
