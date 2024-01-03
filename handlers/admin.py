@@ -11,6 +11,7 @@ from control_db import Database
 from keyboards.admin import admin_kb, send_alarm
 from keyboards.menu import hide_kb
 from main import bot
+from datetime import datetime
 
 router = Router()
 
@@ -36,6 +37,26 @@ async def admin(message: Message):
     if message.from_user.id in ADMINS:
         await message.delete()
         await message.answer("Ось ваша клавіатура ⬇️", reply_markup=admin_kb())
+
+
+@router.message(F.text == "Люди 👥")
+async def people_ex(message: Message):
+    if not message.from_user.id in ADMINS:
+        return
+
+    db = await Database.setup()
+    all_users = await db.get_all_user()
+    premium_users = await db.get_all_premium_telegram_id()
+
+    new = "Користувачі які ні разу не купували преміум:"
+
+    for telegram_id, username, date_join in all_users[0]:
+        if telegram_id not in premium_users[0]:
+            data = datetime.strptime(date_join, "%d.%m.%Y %H:%M")
+            formatted_date = data.strftime("%d.%m.%Y %H:%M")
+            new += f"\nІм`я: @{username}\nID: {telegram_id}\nДата приєднання{formatted_date}"
+
+    await message.answer()
 
 
 @router.message(F.text == "Статистика 📊")

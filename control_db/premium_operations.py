@@ -86,8 +86,6 @@ class PremiumOperations(BaseDBPart):
             days = timedelta(days=day)
             start = int((now - days).replace(hour=0, minute=0, second=0).timestamp())
             today = int(now.replace(hour=0, minute=0, second=0).timestamp())
-            print((1704141379 >= start), "1704141379 >=", start)
-            print((1704141379 <= today), "1704141379 <=", today)
             operations = await (
                 await self.cur.execute(request, (start, today, "Approved"))
             ).fetchone()

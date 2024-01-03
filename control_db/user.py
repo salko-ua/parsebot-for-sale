@@ -36,6 +36,12 @@ class UserDB(BaseDBPart):
         ).fetchall()
         return result
 
+    async def get_all_user(self):
+        result = await (
+            await self.cur.execute("SELECT telegram_id, username, date_join FROM user")
+        ).fetchall()
+        return result
+
     async def add_user(self, telegram_id, first_name, username, date_join):
         await self.cur.execute(
             """INSERT INTO user(telegram_id, first_name, username, date_join) VALUES (?,?,?,?)""",
