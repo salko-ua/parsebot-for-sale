@@ -1,8 +1,8 @@
-from typing import Callable, Dict, Any, Awaitable
-from aiogram import BaseMiddleware
-from aiogram.types import TelegramObject, CallbackQuery, Message
+from typing import Any, Awaitable, Callable, Dict
+
 import aiohttp
-from aiogram import F
+from aiogram import BaseMiddleware, F
+from aiogram.types import CallbackQuery, Message, TelegramObject
 
 
 class CheckConnectioError(BaseMiddleware):

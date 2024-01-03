@@ -9,11 +9,11 @@ import aiohttp
 from aiogram import F, Router
 from aiogram.types import CallbackQuery
 
-from main import bot
+from config import MERCHANT_ACCOUNT, MERCHANT_DOMAIN_NAME, SECRET_KEY
 from control_db import Database
 from keyboards.menu import hide_kb
 from keyboards.premium import buy_url
-from config import SECRET_KEY, MERCHANT_ACCOUNT, MERCHANT_DOMAIN_NAME
+from main import bot
 
 router = Router()
 

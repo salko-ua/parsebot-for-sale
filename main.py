@@ -3,15 +3,15 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from middleware import CheckConnectioError, CheckPrivateChat
-from config import TOKEN
 
+from config import TOKEN
+from middleware import CheckConnectioError, CheckPrivateChat
 
 bot = Bot(token=TOKEN, parse_mode="HTML")
 scheduler = AsyncIOScheduler(timezone="Europe/Kiev")
 dp = Dispatcher()
 
-from handlers import admin, menu, parsing, telegram, payments, task
+from handlers import admin, menu, parsing, payments, task, telegram
 
 
 async def register_handlers():
