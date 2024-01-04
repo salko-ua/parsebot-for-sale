@@ -50,11 +50,13 @@ async def all_people_from_db(message: Message):
     all_users = await db.get_all_user()
     text = "Всі Користувачі 👥"
     for telegram_id, first_name, username, parsing_post, date_join in all_users:
+        date_join = datetime.strptime(date_join, "%Y-%m-%d %H:%M:%S.%f")
+        formatted_date = date_join.strftime("%Y-%m-%d %H:%M")
         text += f"\nID: {telegram_id}"
         text += f"\nІм`я: {first_name}"
         text += f"\nПсевдонім: {username}"
         text += f"\nСтворив постів: {parsing_post}"
-        text += f"\nПриєднався: {date_join}\n\n"
+        text += f"\nПриєднався: {formatted_date}\n\n"
 
     file = types.BufferedInputFile(file=text.encode(), filename=f"Всі Користувачі.txt")
     await message.answer_document(file)
