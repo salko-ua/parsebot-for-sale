@@ -1,6 +1,6 @@
 import asyncio
 import traceback
-
+from pathlib import Path
 from aiogram import types, F, Router
 from aiogram.filters import Command
 from aiogram.filters.state import State, StatesGroup
@@ -55,13 +55,9 @@ async def all_people_from_db(message: Message):
         text += f"\nПсевдонім: {username}"
         text += f"\nСтворив постів: {parsing_post}"
         text += f"\nПриєднався: {date_join}\n\n"
-    try:
-        await message.answer(text, reply_markup=hide_kb())
-    except:
-        await message.answer(
-            "Тексту забагато напишіть розробнику що він болван і досі не зробив адаптацію до великого тексту",
-            reply_markup=hide_kb(),
-        )
+
+    file = types.BufferedInputFile(file=text.encode(), filename=f"Всі Користувачі.txt")
+    await message.answer_document(file)
 
 
 @router.message(F.text == "Всі Кориистувачі 👑")
@@ -85,13 +81,11 @@ async def all_premium_from_db(message: Message):
         text += f"\nПокупок: {bought_premium}"
         text += f"\nКупив\Продовжив: {date_purchase}"
         text += f"\nДіє до: {expiration_date}\n\n"
-    try:
-        await message.answer(text, reply_markup=hide_kb())
-    except:
-        await message.answer(
-            "Тексту забагато напишіть розробнику що він болван і досі не зробив адаптацію до великого тексту",
-            reply_markup=hide_kb(),
-        )
+
+    file = types.BufferedInputFile(
+        file=text.encode(), filename=f"Користувачі що купували.txt"
+    )
+    await message.answer_document(file)
 
 
 @router.message(F.text == "Користувачі що не мали 👑")
@@ -111,13 +105,11 @@ async def people_ex(message: Message):
             date_join = datetime.strptime(date_join, "%Y-%m-%d %H:%M:%S.%f")
             formatted_date = date_join.strftime("%Y-%m-%d %H:%M")
             new += f"\nІм`я: @{username}\nID: {telegram_id}\nВикористав тест: {'так' if parsing_post > 0 else 'ні'}\nПриєднався: {formatted_date}\n"
-    try:
-        await message.answer(new, reply_markup=hide_kb())
-    except:
-        await message.answer(
-            "Тексту забагато напишіть розробнику що він болван і досі не зробив адаптацію до великого тексту",
-            reply_markup=hide_kb(),
-        )
+
+    file = types.BufferedInputFile(
+        file=new.encode(), filename=f"Не купували преміум.txt"
+    )
+    await message.answer_document(file)
 
 
 @router.message(F.text == "Статистика 📊")
