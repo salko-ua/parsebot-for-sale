@@ -78,7 +78,7 @@ async def add_fucking_stupid_people(message: Message):
     await bot.send_message(
         chat_id=-1001902595324,
         message_thread_id=392,
-        text=f"Оплата пройшла успішно @{await db.get_username(data[1])} {data[1]}\nКод оплати PRIVATE\nКод підписки PRIVATE",
+        text=f"Оплата пройшла успішно @{await db.get_username(data[1])} {data[1]}\nКод оплати: 1100\nТип: Особиста оплата",
     )
     # [N] CHECK NEW OR OLD USER AND SEND NOTIFY
     if await db.get_bought_premium(data[1]) > 1:
