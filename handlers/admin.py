@@ -67,6 +67,27 @@ async def add_fucking_stupid_people(message: Message):
     await db.update_premium_operations(
         reason_code=1100, transaction_status="PRIVATE", order_reference="PRIVATE"
     )
+    # [N] NOTIFY ADMINISTARTOR
+    await bot.send_message(
+        chat_id=-1001902595324,
+        message_thread_id=392,
+        text=f"Оплата пройшла успішно @{await db.get_username(telegram_id)} {telegram_id}\nКод оплати PRIVATE\nКод підписки PRIVATE",
+    )
+    # [N] CHECK NEW OR OLD USER AND SEND NOTIFY
+    if await db.get_bought_premium(telegram_id) > 1:
+        expiration_date = await db.get_expiration_date(telegram_id)
+        await bot.send_message(
+            chat_id=telegram_id,
+            text=f"Дякую за підписку, її продовженно до {expiration_date}",
+            reply_markup=hide_kb(),
+        )
+        return
+    expiration_date = await db.get_expiration_date(telegram_id)
+    await bot.send_message(
+        chat_id=telegram_id,
+        text=f"Дякую за підписку, вона діятиме до {expiration_date}",
+        reply_markup=hide_kb(),
+    )
 
 
 @router.message(F.text == "Всі Користувачі 👥")
