@@ -40,6 +40,35 @@ async def admin(message: Message):
         await message.answer("Ось ваша клавіатура ⬇️", reply_markup=admin_kb())
 
 
+"""
+await db.add_premium_user(telegram_id)
+
+        # [N] DELETE OLD MESSAGE
+        await bot.delete_message(chat_id=telegram_id, message_id=message_id)
+
+        # [N] UPDATE CODE IN BD
+        await db.update_premium_operations(
+            reason_code=response.reason_code,
+            transaction_status=response.transaction_status,
+            order_reference=response.order_reference,
+        )
+"""
+
+
+@router.message(F.text.startswith("add"))
+async def add_fucking_stupid_people(message: Message):
+    if not message.from_user.id in ADMINS:
+        return
+
+    db = await Database.setup()
+    telegram_id = message.text[-4:]
+
+    await db.add_premium_user(telegram_id)
+    await db.update_premium_operations(
+        reason_code=1100, transaction_status="PRIVATE", order_reference="PRIVATE"
+    )
+
+
 @router.message(F.text == "Всі Користувачі 👥")
 async def all_people_from_db(message: Message):
     if not message.from_user.id in ADMINS:
