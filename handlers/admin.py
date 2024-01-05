@@ -13,6 +13,7 @@ from keyboards.admin import admin_kb, send_alarm
 from keyboards.menu import hide_kb
 from main import bot
 from datetime import datetime
+from handlers.payments import generate_random_string
 
 router = Router()
 
@@ -61,30 +62,36 @@ async def add_fucking_stupid_people(message: Message):
         return
 
     db = await Database.setup()
-    telegram_id = message.text[-4:]
+    data = (message.text).split()
 
-    await db.add_premium_user(telegram_id)
+    await db.add_premium_user(data[1])
     await db.update_premium_operations(
-        reason_code=1100, transaction_status="PRIVATE", order_reference="PRIVATE"
+        telegram_id=data[1],
+        message_id=message.message_id,
+        order_reference=generate_random_string(12),
+        order_date=int(datetime.now().replace(hour=0, minute=0, second=0).timestamp()),
+        reason_code=1100,
+        transaction_status="Approved",
+        price=data[2],
     )
     # [N] NOTIFY ADMINISTARTOR
     await bot.send_message(
         chat_id=-1001902595324,
         message_thread_id=392,
-        text=f"Оплата пройшла успішно @{await db.get_username(telegram_id)} {telegram_id}\nКод оплати PRIVATE\nКод підписки PRIVATE",
+        text=f"Оплата пройшла успішно @{await db.get_username(data[1])} {data[1]}\nКод оплати PRIVATE\nКод підписки PRIVATE",
     )
     # [N] CHECK NEW OR OLD USER AND SEND NOTIFY
-    if await db.get_bought_premium(telegram_id) > 1:
-        expiration_date = await db.get_expiration_date(telegram_id)
+    if await db.get_bought_premium(data[1]) > 1:
+        expiration_date = await db.get_expiration_date(data[1])
         await bot.send_message(
-            chat_id=telegram_id,
+            chat_id=data[1],
             text=f"Дякую за підписку, її продовженно до {expiration_date}",
             reply_markup=hide_kb(),
         )
         return
-    expiration_date = await db.get_expiration_date(telegram_id)
+    expiration_date = await db.get_expiration_date(data[1])
     await bot.send_message(
-        chat_id=telegram_id,
+        chat_id=data[1],
         text=f"Дякую за підписку, вона діятиме до {expiration_date}",
         reply_markup=hide_kb(),
     )
