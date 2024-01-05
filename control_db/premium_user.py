@@ -76,7 +76,9 @@ class PremiumUser(BaseDBPart):
         return date_purchase[0][0]
 
     async def delete_premium_user(self, telegram_id):
-        await self.cur.execute("DELETE FROM user WHERE telegram_id = ?", (telegram_id,))
+        await self.cur.execute(
+            "DELETE FROM premium_user WHERE telegram_id = ?", (telegram_id,)
+        )
         await self.base.commit()
 
     async def add_premium_user(self, telegram_id):
