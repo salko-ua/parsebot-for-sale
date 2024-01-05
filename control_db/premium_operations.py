@@ -54,6 +54,13 @@ class PremiumOperations(BaseDBPart):
         )
         return await self.base.commit()
 
+    async def delete_premium_operation(self, telegram_id):
+        await self.cur.execute(
+            "DELETE FROM premium_operations WHERE telegram_id = ? AND transaction_status = ?",
+            (telegram_id, "Approved"),
+        )
+        await self.base.commit()
+
     async def check_all_order_reference(self) -> Iterable[Row]:
         return await (
             await self.cur.execute(

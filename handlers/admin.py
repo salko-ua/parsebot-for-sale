@@ -127,7 +127,15 @@ async def delete_fucking_stupid_people(message: Message):
     db = await Database.setup()
     data = (message.text).split()
 
-    await db.delete_premium_user(data[1])
+    try:
+        await db.delete_premium_user(data[1])
+    except:
+        pass
+
+    try:
+        await db.delete_premium_operation(data[1])
+    except:
+        pass
 
 
 @router.message(F.text == "Всі Користувачі 👥")
