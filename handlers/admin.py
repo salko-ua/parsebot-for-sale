@@ -119,6 +119,39 @@ async def all_people_from_db(message: Message):
     await message.answer_document(file)
 
 
+@router.message(F.text.startswith("delete"))
+async def delete_fucking_stupid_people(message: Message):
+    if not message.from_user.id in ADMINS:
+        return
+
+    db = await Database.setup()
+    data = (message.text).split()
+
+    await db.delete_premium_user(data[1])
+
+
+@router.message(F.text == "Всі Користувачі 👥")
+async def all_people_from_db(message: Message):
+    if not message.from_user.id in ADMINS:
+        return
+    await message.delete()
+
+    db = await Database.setup()
+    all_users = await db.get_all_user()
+    text = "Всі Користувачі 👥"
+    for telegram_id, first_name, username, parsing_post, date_join in all_users:
+        date_join = datetime.strptime(date_join, "%Y-%m-%d %H:%M:%S.%f")
+        formatted_date = date_join.strftime("%Y-%m-%d %H:%M")
+        text += f"\nID: {telegram_id}"
+        text += f"\nІм`я: {first_name}"
+        text += f"\nПсевдонім: {username}"
+        text += f"\nСтворив постів: {parsing_post}"
+        text += f"\nПриєднався: {formatted_date}\n\n"
+
+    file = types.BufferedInputFile(file=text.encode(), filename=f"Всі Користувачі.txt")
+    await message.answer_document(file)
+
+
 @router.message(F.text == "Всі Кориистувачі 👑")
 async def all_premium_from_db(message: Message):
     if not message.from_user.id in ADMINS:
