@@ -52,6 +52,8 @@ async def start(message: Message):
         disable_web_page_preview=True,
     )
 
+    asyncio.sleep(7)
+
     caption = (
         f"🏡1к кв\n"
         f"🏢Поверх: 2 з 11\n"
@@ -62,7 +64,10 @@ async def start(message: Message):
         f"📝Опис: \nопис який знаходиться під постом на сайті олх"
     )
     media_group = MediaGroupBuilder(caption=caption)
-    media_group.add_photo(type="photo", media=types.FSInputFile(".\photo\\1.jpg"))
+    media_group.add_photo(
+        type="photo",
+        media=r"https://img.freepik.com/premium-photo/on-a-black-surface-bright-multicolored-stickers-with-the-word-test_380694-1057.jpg?w=1800",
+    )
     await message.answer_media_group(media=media_group.build())
 
 
