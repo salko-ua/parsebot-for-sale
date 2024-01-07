@@ -52,7 +52,7 @@ async def start(message: Message):
         disable_web_page_preview=True,
     )
 
-    asyncio.sleep(7)
+    await asyncio.sleep(7)
 
     caption = (
         f"🏡1к кв\n"
