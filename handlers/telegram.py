@@ -36,7 +36,7 @@ async def start(message: Message):
             disable_web_page_preview=True,
         )
         return
-    print(len("Я бот 🤖 'помічник рієлтора' створюю пости з сайту olx.ua 🌐"))
+
     await message.answer(
         f"Привіт {message.from_user.first_name} 👋,\n"
         "Я 'Помічник рієлтора' створюю пости з olx.ua 🌐\n"
@@ -51,8 +51,6 @@ async def start(message: Message):
         reply_markup=menu_kb(),
         disable_web_page_preview=True,
     )
-
-    await asyncio.sleep(5)
 
     caption = (
         f"🏡1к кв\n"
