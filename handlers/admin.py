@@ -41,21 +41,6 @@ async def admin(message: Message):
         await message.answer("Ось ваша клавіатура ⬇️", reply_markup=admin_kb())
 
 
-"""
-await db.add_premium_user(telegram_id)
-
-        # [N] DELETE OLD MESSAGE
-        await bot.delete_message(chat_id=telegram_id, message_id=message_id)
-
-        # [N] UPDATE CODE IN BD
-        await db.update_premium_operations(
-            reason_code=response.reason_code,
-            transaction_status=response.transaction_status,
-            order_reference=response.order_reference,
-        )
-"""
-
-
 @router.message(F.text.startswith("add"))
 async def add_fucking_stupid_people(message: Message):
     if not message.from_user.id in ADMINS:

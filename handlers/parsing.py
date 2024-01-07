@@ -1,7 +1,5 @@
 import traceback
 from datetime import datetime
-from urllib.parse import urlparse
-
 from aiogram import Bot, F, Router
 from aiogram.types import Message
 
@@ -19,7 +17,7 @@ async def main(message: Message, bot: Bot):
     print(((await db.check_count_parsing_post(telegram_id))[0][0]))
 
     if not await db.is_premium_user(telegram_id):
-        if (await db.check_count_parsing_post(telegram_id))[0][0] > 0:
+        if (await db.check_count_parsing_post(telegram_id))[0][0] >= 10:
             await message.answer("Придбайте підписку щоб користуватись ботом!")
             return
 
