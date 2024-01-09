@@ -1,10 +1,10 @@
-import asyncio
 import datetime
 
 from aiogram import F, Router, types
+from aiogram.utils.media_group import MediaGroupBuilder
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.media_group import MediaGroupBuilder
+import asyncio
 
 from control_db import Database
 from keyboards.menu import menu_kb

@@ -1,9 +1,7 @@
 import asyncio
 import traceback
-from datetime import datetime
 from pathlib import Path
-
-from aiogram import F, Router, types
+from aiogram import types, F, Router
 from aiogram.filters import Command
 from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -11,10 +9,11 @@ from aiogram.types import CallbackQuery, Message
 
 from config import ADMINS
 from control_db import Database
-from handlers.payments import generate_random_string
 from keyboards.admin import admin_kb, send_alarm
 from keyboards.menu import hide_kb
 from main import bot
+from datetime import datetime
+from handlers.payments import generate_random_string
 
 router = Router()
 

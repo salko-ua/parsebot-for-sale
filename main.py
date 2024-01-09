@@ -4,16 +4,15 @@ import logging
 from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from config import SENTRY_SDK, TOKEN
+from config import TOKEN, SENTRY_SDK
 from middleware import CheckConnectioError, CheckPrivateChat
 
 bot = Bot(token=TOKEN, parse_mode="HTML")
 scheduler = AsyncIOScheduler(timezone="Europe/Kiev")
 dp = Dispatcher()
 
-import sentry_sdk
-
 from handlers import admin, menu, parsing, payments, task, telegram
+import sentry_sdk
 
 sentry_sdk.init(
     dsn=SENTRY_SDK,
