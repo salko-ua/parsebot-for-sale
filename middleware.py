@@ -13,8 +13,8 @@ class CheckConnectioError(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
         try:
-            print(event.chat.id)
-            print(event.message_thread_id)
+            # print(event.chat.id)
+            # print(event.message_thread_id)
             return await handler(event, data)
         except aiohttp.ClientConnectionError as e:
             print(f"Error: {e}")
@@ -27,13 +27,11 @@ class CheckPrivateChat(BaseMiddleware):
         event: Message | CallbackQuery,
         data: Dict[str, Any],
     ) -> Any:
-        if (
-            isinstance(event, CallbackQuery)
-            and event.message
-            and event.message.chat.type == "private"
-        ):
-            return await handler(event, data)
-        elif isinstance(event, Message) and event.chat.type == "private":
-            return await handler(event, data)
+        if isinstance(event, CallbackQuery):
+            if event.message.chat.type == "private":
+                return await handler(event, data)
+        elif isinstance(event, Message):
+            if event.chat.type == "private":
+                return await handler(event, data)
         else:
             pass
