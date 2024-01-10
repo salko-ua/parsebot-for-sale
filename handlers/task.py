@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime, timedelta
+from main import bot
 
 import aiohttp
 
@@ -46,21 +47,15 @@ async def check_all_premium(lock):
         print(subscription_dict)
 
         current_date = datetime.now().date()
-        print("\n\n")
         for telegram_id, expiration_date in subscription_dict.items():
             expiration_date_in_3_days = expiration_date - timedelta(days=3)
-            print(expiration_date)
-            print(expiration_date_in_3_days)
-            print(current_date)
             if expiration_date_in_3_days == current_date:
                 print(f"Підписка для telegram_id {telegram_id} лишилось 3 дні")
             elif expiration_date == current_date:
                 print(f"Підписка для telegram_id {telegram_id} лишилось цей день")
             elif expiration_date >= current_date:
-                print(f"Підписка для telegram_id {telegram_id} активна.")
-            else:
-                print(f"Термін дії підписки для telegram_id {telegram_id} минув.")
-        print("\n\n")
+                # await bot.send_message(text=f"", chat_id=-1001902595324 message_thread_id=)  # notify admin
+                await bot.send_message()  # notify user
 
 
 async def create_tasks():
