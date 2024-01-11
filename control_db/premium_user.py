@@ -3,7 +3,7 @@ from typing import Iterable
 
 from aiosqlite import Row
 from dateutil.relativedelta import relativedelta
-
+from typing import Optional
 from control_db.create_db import BaseDBPart
 
 
@@ -16,6 +16,16 @@ class PremiumUser(BaseDBPart):
             )
         ).fetchall()
         return bool(result[0][0])
+
+    async def turn_premium_user(self, telegram_id: int, turn: int):
+        await self.cur.execute(
+            "UPDATE premium_user SET is_premium = ? WHERE telegram_id = ?",
+            (
+                turn,
+                telegram_id,
+            ),
+        )
+        return await self.base.commit()
 
     async def get_count_premium_user(self, is_premium: int):
         result = await (

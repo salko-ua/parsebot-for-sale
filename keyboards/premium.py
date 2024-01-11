@@ -13,7 +13,7 @@ def buy_premium_kb(chose: bool) -> InlineKeyboardMarkup:
     for button in keyboard:
         builder.add(InlineKeyboardButton(text=button, callback_data=button))
 
-    return builder.adjust(2).as_markup(resize_keyboard=True)
+    return builder.adjust(1).as_markup(resize_keyboard=True)
 
 
 def buy_url(url: str, order_reference: str) -> InlineKeyboardMarkup:

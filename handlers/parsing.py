@@ -14,7 +14,6 @@ async def main(message: Message, bot: Bot):
     db = await Database.setup()
     date = datetime.now().timestamp()
     telegram_id = message.from_user.id
-    print(((await db.check_count_parsing_post(telegram_id))[0][0]))
 
     if not await db.is_premium_user(telegram_id):
         if (await db.check_count_parsing_post(telegram_id))[0][0] >= 5:

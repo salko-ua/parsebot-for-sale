@@ -25,7 +25,6 @@ class PremiumOperations(BaseDBPart):
         ).fetchall()
 
         if not response[0][0]:
-            print("add_operation")
             await self.cur.execute(
                 """INSERT INTO premium_operations 
                     (telegram_id, message_id, order_date, 
@@ -43,7 +42,6 @@ class PremiumOperations(BaseDBPart):
             )
             return await self.base.commit()
 
-        print("update_operation")
         await self.cur.execute(
             "UPDATE premium_operations SET reason_code = ?, transaction_status = ? WHERE order_reference = ?",
             (

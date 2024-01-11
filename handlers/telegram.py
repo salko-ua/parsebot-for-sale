@@ -8,6 +8,7 @@ import asyncio
 
 from control_db import Database
 from keyboards.menu import menu_kb
+from handlers.task import check_all_premium
 
 router = Router()
 
@@ -75,6 +76,13 @@ async def start(message: Message):
 async def keyboard(message: Message):
     await message.delete()
     await message.answer("⬇️ Ваша панель з кнопками ⬇️", reply_markup=menu_kb())
+
+
+@router.message(Command("check"))
+async def keyboard(message: Message):
+    await message.delete()
+    lock = asyncio.Lock()
+    await check_all_premium(lock)
 
 
 @router.callback_query(F.data == "Сховати ❌")

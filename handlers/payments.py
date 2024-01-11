@@ -237,6 +237,11 @@ async def check_status_invoice(
             message_thread_id=392,
             text=f"Оплата пройшла успішно @{await db.get_username(telegram_id)} {telegram_id}\nКод оплати {response.reason_code}\nКод підписки {reference}",
         )
+        await bot.send_message(
+            text=f"Підписка {telegram_id} додалась 🟩",
+            chat_id=-1001902595324,
+            message_thread_id=481,
+        )
 
         # [N] CHECK NEW OR OLD USER AND SEND NOTIFY
         if await db.get_bought_premium(telegram_id) > 1:
