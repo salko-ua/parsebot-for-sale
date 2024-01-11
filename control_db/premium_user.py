@@ -137,7 +137,8 @@ class PremiumUser(BaseDBPart):
 
     async def get_all_premium_user(self) -> Iterable[Row]:
         cursor = await self.cur.execute(
-            "SELECT telegram_id, expiration_date FROM premium_user"
+            "SELECT telegram_id, expiration_date FROM premium_user WHERE is_premium = ?",
+            (1),
         )
         rows = await cursor.fetchall()
 
