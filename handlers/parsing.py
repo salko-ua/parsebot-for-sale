@@ -29,6 +29,7 @@ async def main(message: Message, bot: Bot):
             f"У користувача {telegram_id} сталася помилка\n"
             f"Details: {exeception}\n"
             f"TraceBack: \n\n{traceback.format_exc()}\n"
+            f"Посилання: {message.text}"
         )
         await bot.send_message(chat_id=2138964363, text=text_for_admin)
         await message.answer(f"Здається пост уже не дійсний 🚫")
