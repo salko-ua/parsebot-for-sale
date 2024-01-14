@@ -1,10 +1,10 @@
 import asyncio
 import logging
-
+import apykuma
 from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from config import TOKEN, SENTRY_SDK
+from config import TOKEN, SENTRY_SDK, KUMA_TOKEN
 from middleware import CheckConnectioError, CheckPrivateChat
 
 bot = Bot(token=TOKEN, parse_mode="HTML")
@@ -42,8 +42,10 @@ async def start_bot():
     await register_handlers()
     await task.create_tasks()
     await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
     print("Bot Online")
+    if KUMA_TOKEN != "":
+        await apykuma.start(url=KUMA_TOKEN, delay=10)
+    await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
