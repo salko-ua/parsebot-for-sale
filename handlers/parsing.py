@@ -10,7 +10,8 @@ router = Router()
 
 
 @router.message(F.text.startswith("https://www.olx.ua/"))
-@router.message(F.text.startswith("https://olx.ua/d/uk/"))
+@router.message(F.text.startswith("https://olx.ua/"))
+@router.message(F.text.startswith("https://m.olx.ua/"))
 async def main(message: Message, bot: Bot):
     db = await Database.setup()
     date = datetime.now().timestamp()
