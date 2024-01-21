@@ -24,7 +24,7 @@ RUN groupadd -g 5000 container && useradd -d /app -m -g container -u 5000 contai
 COPY --from=poetry /root/requirements.txt ./
 RUN pip --no-cache-dir install -U pip && \
     pip --no-cache-dir install -r requirements.txt
-COPY src/ src/
+COPY . .
 
 FROM base AS final
 
