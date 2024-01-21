@@ -41,13 +41,13 @@ class Information:
     # Парсинг головної інформації (к-ть кімнат, поверх, площа, Район)
     def get_main_information(soup: BeautifulSoup) -> [str, str, str, str]:
         # constants to check the list "tags"
-        NEED_WORDS_UKRAINIAN = [
+        need_words_ukrainian = [
             "Кількість кімнат:",
             "Загальна площа:",
             "Поверх:",
             "Поверховість:",
         ]
-        NEED_WORDS_RUSSIAN = [
+        need_words_russian = [
             "Количество комнат:",
             "Общая площадь:",
             "Этаж:",
@@ -57,30 +57,30 @@ class Information:
         checklist = []
         tags = soup.find("ul", class_="css-sfcl1s").find_all("p")
 
-        for need_word in NEED_WORDS_RUSSIAN:
+        for need_word in need_words_russian:
             for tag in tags:
                 if need_word in tag.text:
                     checklist.append(tag.text)
 
-        for need_word in NEED_WORDS_UKRAINIAN:
+        for need_word in need_words_ukrainian:
             for tag in tags:
                 if need_word in tag.text:
                     checklist.append(tag.text)
 
-        if len(checklist) != 4:
-            find_rooms = re.search(r"\d+", checklist[0])
-            find_area = re.search(r"\d+", checklist[1])
-            find_everything = re.search(r"\d+", checklist[2])
-            flour = f"{find_everything.group()}"
-        else:
-            find_rooms = re.search(r"\d+", checklist[0])
-            find_area = re.search(r"\d+", checklist[1])
-            find_have = re.search(r"\d+", checklist[2])
-            find_everything = re.search(r"\d+", checklist[3])
-            flour = f"{find_have.group()} з {find_everything.group()}"
-
-        rooms = find_rooms.group()
-        area = find_area.group()
+        try:
+            if len(checklist) != 4:
+                rooms = re.search(r"\d+", checklist[0]).group()
+                area = re.search(r"\d+", checklist[1]).group()
+                find_everything = re.search(r"\d+", checklist[2])
+                flour = f"{find_everything.group()}"
+            else:
+                rooms = re.search(r"\d+", checklist[0]).group()
+                area = re.search(r"\d+", checklist[1]).group()
+                find_have = re.search(r"\d+", checklist[2])
+                find_everything = re.search(r"\d+", checklist[3])
+                flour = f"{find_have.group()} з {find_everything.group()}"
+        except:
+            rooms, area, flour = "", "", ""
 
         # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -223,17 +223,14 @@ class Information:
         rooms, flour, area, district = Information.get_main_information(soup)
         money = Information.get_price(soup)
 
-        main_caption = (
-            f"🏡{rooms}к кв\n"
-            f"🏢Поверх: {flour}\n"
-            f"🔑Площа: {area}м2\n"
-            f"📍Район: {district}\n"
-            f"💳️{money}"
-            f"\n\n{header}\n\n"
-            f"📝Опис:\n{caption}"
+        captions = (
+            f"🏡{rooms}к кв\n" f"🏢Поверх: {flour}\n" f"🔑Площа: {area}м2\n" f"📍Район: {district}\n"
         )
 
-        return main_caption
+        main_caption = f"💳️{money}" f"\n\n{header}\n\n" f"📝Опис:\n{caption}"
+        if not rooms != "":
+            return main_caption
+        return captions + main_caption
 
 
 # Отримання всіх даних і запуск надсилання
