@@ -73,9 +73,7 @@ def create_hash(to_encode: list[str | int | None]) -> str:
     to_hash = ""
     for element in to_encode:
         to_hash += (str(element) if element is not None else "") + ";"
-    hash = hmac.new(
-        SECRET_KEY.encode("utf-8"), to_hash[:-1].encode("utf-8"), "MD5"
-    ).hexdigest()
+    hash = hmac.new(SECRET_KEY.encode("utf-8"), to_hash[:-1].encode("utf-8"), "MD5").hexdigest()
     return hash
 
 
@@ -296,6 +294,4 @@ async def cancel_invoice(query: CallbackQuery):
     merchant_account = "t_me_48799"
     order_reference = query.data[-12:]
     await query.message.delete()
-    await remove_invoice(
-        merchant_account=merchant_account, order_reference=order_reference
-    )
+    await remove_invoice(merchant_account=merchant_account, order_reference=order_reference)

@@ -173,9 +173,7 @@ async def all_premium_from_db(message: Message):
         text += f"\nКупив\Продовжив: {date_purchase}"
         text += f"\nДіє до: {expiration_date}\n\n"
 
-    file = types.BufferedInputFile(
-        file=text.encode(), filename=f"Користувачі що купували.txt"
-    )
+    file = types.BufferedInputFile(file=text.encode(), filename=f"Користувачі що купували.txt")
     await message.answer_document(file)
 
 
@@ -197,9 +195,7 @@ async def people_ex(message: Message):
             formatted_date = date_join.strftime("%Y-%m-%d %H:%M")
             new += f"\nІм`я: @{username}\nID: {telegram_id}\nВикористав тест: {'так' if parsing_post > 0 else 'ні'}\nПриєднався: {formatted_date}\n"
 
-    file = types.BufferedInputFile(
-        file=new.encode(), filename=f"Не купували преміум.txt"
-    )
+    file = types.BufferedInputFile(file=new.encode(), filename=f"Не купували преміум.txt")
     await message.answer_document(file)
 
 
