@@ -37,9 +37,7 @@ class PremiumUser(BaseDBPart):
         return result[0][0]
 
     async def get_all_premium_telegram_id(self):
-        result = await (
-            await self.cur.execute("SELECT `telegram_id` FROM premium_user")
-        ).fetchall()
+        result = await (await self.cur.execute("SELECT `telegram_id` FROM premium_user")).fetchall()
         return result
 
     async def get_all_premium(self):
@@ -86,9 +84,7 @@ class PremiumUser(BaseDBPart):
         return date_purchase[0][0]
 
     async def delete_premium_user(self, telegram_id):
-        await self.cur.execute(
-            "DELETE FROM premium_user WHERE telegram_id = ?", (telegram_id,)
-        )
+        await self.cur.execute("DELETE FROM premium_user WHERE telegram_id = ?", (telegram_id,))
         await self.base.commit()
 
     async def add_premium_user(self, telegram_id):
@@ -125,8 +121,7 @@ class PremiumUser(BaseDBPart):
             return await self.base.commit()
 
         continue_data = (
-            datetime.strptime(expiration_date[0][0], "%d.%m.%Y")
-            + relativedelta(months=1)
+            datetime.strptime(expiration_date[0][0], "%d.%m.%Y") + relativedelta(months=1)
         ).strftime("%d.%m.%Y")
 
         await self.cur.execute(
@@ -138,7 +133,7 @@ class PremiumUser(BaseDBPart):
     async def get_all_premium_user(self) -> Iterable[Row]:
         cursor = await self.cur.execute(
             "SELECT telegram_id, expiration_date FROM premium_user WHERE is_premium = ?",
-            (1),
+            (1,),
         )
         rows = await cursor.fetchall()
 
