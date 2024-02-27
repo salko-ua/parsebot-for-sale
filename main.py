@@ -7,7 +7,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from config import TOKEN, SENTRY_SDK, KUMA_TOKEN
 from middleware import CheckConnectioError, CheckPrivateChat
 
-bot = Bot(token=TOKEN, parse_mode="HTML")
+bot = Bot(token=TOKEN)
 scheduler = AsyncIOScheduler(timezone="Europe/Kiev")
 dp = Dispatcher()
 
