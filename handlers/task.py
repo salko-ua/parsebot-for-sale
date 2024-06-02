@@ -15,7 +15,7 @@ async def check_all_invoice(lock):
     async with lock:
         db = await Database.setup()
         order_reference = await db.check_all_order_reference()
-        if order_reference != []:
+        if order_reference:
             for reference in order_reference:
                 try:
                     response = await get_payment_info(reference[0], MERCHANT_ACCOUNT)
@@ -66,19 +66,19 @@ async def check_all_premium(lock):
             if text_user:
                 await notify_status_premium(
                     text_user=text_user,
-                    texr_admin=text_admin,
+                    text_admin=text_admin,
                     telegram_id=telegram_id,
                 )
 
 
-async def notify_status_premium(text_user: str, texr_admin: str, telegram_id: int) -> None:
+async def notify_status_premium(text_user: str, text_admin: str, telegram_id: int) -> None:
     try:
-        await bot.send_message(text=texr_admin, chat_id=-1001902595324, message_thread_id=481)
+        await bot.send_message(text=text_admin, chat_id=-1001902595324, message_thread_id=481)
         await bot.send_message(
             text=text_user, chat_id=telegram_id, reply_markup=buy_premium_kb(True)
         )
-    except:
-        pass
+    except Exception as e:
+        print(f'NOTIFY BLOCK ERROR: {e}')
 
 
 async def create_tasks():

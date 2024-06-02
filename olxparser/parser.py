@@ -3,6 +3,7 @@ from ast import Await
 
 import requests
 from aiogram import types
+from aiogram.utils.media_group import MediaGroupBuilder
 from bs4 import BeautifulSoup
 
 from main import bot
@@ -16,11 +17,11 @@ def get_url(url):
 
 class Information:
     # Парсинг 10 перших фото
-    def get_photo(soup: BeautifulSoup, a_lot_of: bool) -> list | types.URLInputFile:
+    def get_photo(soup: BeautifulSoup, caption: str) -> list:
         photo = soup.find("div", class_="swiper-wrapper").find_all("img")
 
         list_src_photo = []
-        media_group = []
+        media_group = MediaGroupBuilder(caption=caption)
 
         for src in photo:
             list_src_photo.append(src.get("src"))
@@ -29,14 +30,9 @@ class Information:
             del list_src_photo[10:]
 
         for photo_url in list_src_photo:
-            media_group.append(types.InputMediaPhoto(media=photo_url))
+            media_group.add_photo(media=photo_url)
 
-        first_photo = types.URLInputFile(str(list_src_photo[0]))
-
-        if not a_lot_of:
-            return first_photo
-
-        return media_group
+        return media_group.build()
 
     # Парсинг головної інформації (к-ть кімнат, поверх, площа, Район)
     def get_main_information(soup: BeautifulSoup) -> [str, str, str, str]:
@@ -236,13 +232,16 @@ class Information:
 # Отримання всіх даних і запуск надсилання
 async def get_data(message: types.Message):
     soup: BeautifulSoup = get_url(message.text)
-    photo_group = Information.get_photo(soup, True)
     caption = Information.create_caption(soup)
+    photo_group = Information.get_photo(soup, caption)
+    new_photo_group = photo_group.copy()
 
-    message_photo = await message.answer_media_group(media=photo_group)
-    await bot.edit_message_caption(
-        message_id=message_photo[0].message_id,
-        chat_id=message.chat.id,
-        caption=caption,
-        parse_mode="HTML",
-    )
+
+    for i in range(len(photo_group)):
+        try:
+            message_photo = await bot.send_media_group(chat_id=-1001902595324, message_thread_id=805, media=[photo_group[i]])
+            await bot.delete_message(message_id=message_photo[0].message_id, chat_id=-1001902595324)
+        except Exception as e:
+            print("remove", i , e)
+            new_photo_group.remove(photo_group[i])
+    await message.answer_media_group(media=new_photo_group)

@@ -73,8 +73,7 @@ def create_hash(to_encode: list[str | int | None]) -> str:
     to_hash = ""
     for element in to_encode:
         to_hash += (str(element) if element is not None else "") + ";"
-    hash = hmac.new(SECRET_KEY.encode("utf-8"), to_hash[:-1].encode("utf-8"), "MD5").hexdigest()
-    return hash
+    return hmac.new(SECRET_KEY.encode("utf-8"), to_hash[:-1].encode("utf-8"), "MD5").hexdigest()
 
 
 def generate_random_string(length: int) -> str:
@@ -86,9 +85,9 @@ async def create_payment(
     order_date: int,
     amount: int,
     currency: str,
-    product_name: list,
-    product_count: list,
-    product_price: list,
+    product_name: tuple,
+    product_count: tuple,
+    product_price: tuple,
 ) -> CreateInvoice:
     merchant_signature = create_hash(
         [
@@ -162,7 +161,7 @@ async def get_payment_info(order_reference: str, merchant_account: str) -> Check
 
 @router.callback_query(F.data == "Продовжити підписку 💳")
 @router.callback_query(F.data == "Придбати підписку 💳")
-async def payment(query: CallbackQuery):
+async def payment(query: CallbackQuery, message=None):
     db = await Database.setup()
     amount = 300
     currency = "UAH"
@@ -185,7 +184,7 @@ async def payment(query: CallbackQuery):
     description = (
         "👑 Підписка на телеграм бота для парсингу\n\n"
         "💸 Тариф: 1 місяць / 300 грн\n\n"
-        "🛠 Послуги: Відкриття доступу до парсингу даних с сайту ОЛХ"
+        "🛠 Послуги: Відкриття доступу до парсингу даних з сайту ОЛХ"
     )
 
     if response.reason_code == 1100:
@@ -229,11 +228,12 @@ async def check_status_invoice(
             order_reference=response.order_reference,
         )
 
-        # [N] NOTIFY ADMINISTARTOR
+        # [N] NOTIFY ADMINISTRATOR
         await bot.send_message(
             chat_id=-1001902595324,
             message_thread_id=392,
-            text=f"Оплата пройшла успішно @{await db.get_username(telegram_id)} {telegram_id}\nКод оплати {response.reason_code}\nКод підписки {reference}",
+            text=f"Оплата успішно проведена @{await db.get_username(telegram_id)} {telegram_id}"
+            f"\nКод оплати {response.reason_code}\nКод підписки {reference}",
         )
         await bot.send_message(
             text=f"Підписка {telegram_id} додалась 🟩",
@@ -246,7 +246,7 @@ async def check_status_invoice(
             expiration_date = await db.get_expiration_date(telegram_id)
             await bot.send_message(
                 chat_id=telegram_id,
-                text=f"Дякую за підписку, її продовженно до {expiration_date}",
+                text=f"Дякую за підписку, її продовжено до {expiration_date}",
                 reply_markup=hide_kb(),
             )
             return
@@ -260,11 +260,11 @@ async def check_status_invoice(
         return
 
     if response.transaction_status == "Declined" and response.reason_code != 1151:
-        # [N] TRY DELETE OLD MESSAGE
+        # [N] TRY TO DELETE OLD MESSAGE
         try:
             await bot.delete_message(chat_id=telegram_id, message_id=message_id)
-        except:
-            pass
+        except Exception as e:
+            print(f"CHECK STATUS INVOICE: {e}")
 
         # [N] UPDATE CODE IN BD
         await db.update_premium_operations(
@@ -273,17 +273,18 @@ async def check_status_invoice(
             order_reference=response.order_reference,
         )
 
-        # [N] NOTIFY ADMINISTARTOR
+        # [N] NOTIFY ADMINISTRATOR
         await bot.send_message(
             chat_id=-1001902595324,
             message_thread_id=392,
-            text=f"Оплата провалилась @{await db.get_username(telegram_id)} {telegram_id}\nКод оплати {response.reason_code}\nКод підписки {reference}",
+            text=f"Оплата провалилась @{await db.get_username(telegram_id)} {telegram_id}"
+            f"\nКод оплати {response.reason_code}\nКод підписки {reference}",
         )
 
         # [N] SEND NOTIFY
         await bot.send_message(
             chat_id=telegram_id,
-            text=f"Оплату нажаль було відхиленно 😕\nЯкщо є питання за додатковою інформацією зверніться до @realtor_057",
+            text=f"Оплату нажаль було відхилено 😕\nЯкщо є питання за додатковою інформацією зверніться до @realtor_057",
             reply_markup=hide_kb(),
         )
         return

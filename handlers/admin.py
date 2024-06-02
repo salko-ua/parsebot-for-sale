@@ -43,11 +43,11 @@ async def admin(message: Message):
 
 @router.message(F.text.startswith("add"))
 async def add_fucking_stupid_people(message: Message):
-    if not message.from_user.id in ADMINS:
+    if message.from_user.id not in ADMINS:
         return
 
     db = await Database.setup()
-    data = (message.text).split()
+    data = message.text.split()
 
     await db.add_premium_user(data[1])
     await db.update_premium_operations(
@@ -59,7 +59,7 @@ async def add_fucking_stupid_people(message: Message):
         transaction_status="Approved",
         price=data[2],
     )
-    # [N] NOTIFY ADMINISTARTOR
+    # [N] NOTIFY ADMINISTRATOR
     await bot.send_message(
         chat_id=-1001902595324,
         message_thread_id=392,
@@ -76,7 +76,7 @@ async def add_fucking_stupid_people(message: Message):
         expiration_date = await db.get_expiration_date(data[1])
         await bot.send_message(
             chat_id=data[1],
-            text=f"Дякую за підписку, її продовженно до {expiration_date}",
+            text=f"Дякую за підписку, її продовження до {expiration_date}",
             reply_markup=hide_kb(),
         )
         return
@@ -90,7 +90,7 @@ async def add_fucking_stupid_people(message: Message):
 
 @router.message(F.text == "Всі Користувачі 👥")
 async def all_people_from_db(message: Message):
-    if not message.from_user.id in ADMINS:
+    if message.from_user.id not in ADMINS:
         return
     await message.delete()
 
@@ -110,50 +110,9 @@ async def all_people_from_db(message: Message):
     await message.answer_document(file)
 
 
-@router.message(F.text.startswith("delete"))
-async def delete_fucking_stupid_people(message: Message):
-    if not message.from_user.id in ADMINS:
-        return
-
-    db = await Database.setup()
-    data = (message.text).split()
-
-    try:
-        await db.delete_premium_user(data[1])
-    except:
-        pass
-
-    try:
-        await db.delete_premium_operation(data[1])
-    except:
-        pass
-
-
-@router.message(F.text == "Всі Користувачі 👥")
-async def all_people_from_db(message: Message):
-    if not message.from_user.id in ADMINS:
-        return
-    await message.delete()
-
-    db = await Database.setup()
-    all_users = await db.get_all_user()
-    text = "Всі Користувачі 👥"
-    for telegram_id, first_name, username, parsing_post, date_join in all_users:
-        date_join = datetime.strptime(date_join, "%Y-%m-%d %H:%M:%S.%f")
-        formatted_date = date_join.strftime("%Y-%m-%d %H:%M")
-        text += f"\nID: {telegram_id}"
-        text += f"\nІм`я: {first_name}"
-        text += f"\nПсевдонім: {username}"
-        text += f"\nСтворив постів: {parsing_post}"
-        text += f"\nПриєднався: {formatted_date}\n\n"
-
-    file = types.BufferedInputFile(file=text.encode(), filename=f"Всі Користувачі.txt")
-    await message.answer_document(file)
-
-
-@router.message(F.text == "Всі Кориистувачі 👑")
+@router.message(F.text == "Всі Користувачі 👑")
 async def all_premium_from_db(message: Message):
-    if not message.from_user.id in ADMINS:
+    if message.from_user.id not in ADMINS:
         return
     await message.delete()
 
@@ -161,16 +120,16 @@ async def all_premium_from_db(message: Message):
     all_premium = await db.get_all_premium()
     text = "Всі користувачі 👑"
     for (
-        telegram_id,
-        is_premium,
-        expiration_date,
-        bought_premium,
-        date_purchase,
+            telegram_id,
+            is_premium,
+            expiration_date,
+            bought_premium,
+            date_purchase,
     ) in all_premium:
         text += f"\nID: {telegram_id}"
         text += f"\nПреміум: {'активний' if is_premium else 'не активний'}"
         text += f"\nПокупок: {bought_premium}"
-        text += f"\nКупив\Продовжив: {date_purchase}"
+        text += f"\nКупив\\Продовжив: {date_purchase}"
         text += f"\nДіє до: {expiration_date}\n\n"
 
     file = types.BufferedInputFile(file=text.encode(), filename=f"Користувачі що купували.txt")
@@ -179,7 +138,7 @@ async def all_premium_from_db(message: Message):
 
 @router.message(F.text == "Користувачі що не мали 👑")
 async def people_ex(message: Message):
-    if not message.from_user.id in ADMINS:
+    if message.from_user.id not in ADMINS:
         return
     await message.delete()
 
@@ -202,7 +161,7 @@ async def people_ex(message: Message):
 @router.message(F.text == "Статистика 📊")
 async def stats(message: Message):
     await message.delete()
-    if not message.from_user.id in ADMINS:
+    if message.from_user.id not in ADMINS:
         return
 
     db = await Database.setup()
@@ -226,16 +185,16 @@ async def stats(message: Message):
         f"Статистика по доходу 📊:\n"
         f"День:\n"
         f"К-ть покупок - {stats_1day['count']}\n"
-        f"Зароблено грошей - {stats_1day['sum'] if stats_1day['sum'] else zero}\n\n"
+        f"Зароблено гривень - {stats_1day['sum'] if stats_1day['sum'] else zero}\n\n"
         f"Тиждень:\n"
         f"К-ть покупок - {stats_7day['count']}\n"
-        f"Зароблено грошей - {stats_7day['sum'] if stats_7day['sum'] else zero}\n\n"
+        f"Зароблено гривень - {stats_7day['sum'] if stats_7day['sum'] else zero}\n\n"
         f"Місяць:\n"
         f"К-ть покупок - {stats_30day['count']}\n"
-        f"Зароблено грошей - {stats_30day['sum'] if stats_30day['sum'] else zero}\n\n"
+        f"Зароблено гривень - {stats_30day['sum'] if stats_30day['sum'] else zero}\n\n"
         f"За весь час:\n"
         f"К-ть покупок - {stats_all_time['count']}\n"
-        f"Зароблено грошей - {stats_all_time['sum'] if stats_all_time['sum'] else zero}\n\n"
+        f"Зароблено гривень - {stats_all_time['sum'] if stats_all_time['sum'] else zero}\n\n"
     )
 
     await message.answer(text=generated_message, reply_markup=hide_kb())
@@ -243,7 +202,7 @@ async def stats(message: Message):
 
 @router.message(F.text == "Розсилка 📢")
 async def alarm(message: Message):
-    if not message.from_user.id in ADMINS:
+    if message.from_user.id not in ADMINS:
         return
 
     text = "Кому написати? 🤔\nОсобисто 👤\nВсім користувачам👥\nПреміум користувачам👑"
@@ -281,7 +240,7 @@ async def send_mixed_news2(message: Message, state: FSMContext):
         await bot.send_message(
             chat_id=message.text, text=f"Адміністратор бота написав: \n{message_text}"
         )
-        await message.answer("Повідомлення надісланно")
+        await message.answer("Повідомлення надіслано")
     except:
         await message.answer("Користувача не знайдено!")
 

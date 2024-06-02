@@ -26,10 +26,10 @@ async def main(message: Message, bot: Bot):
         await get_data(message)
         await db.update_count_parsing_post(telegram_id)
         await db.add_url(telegram_id, url=message.text, date=date)
-    except Exception as exeception:
+    except Exception as e:
         text_for_admin = (
             f"У користувача {telegram_id} сталася помилка\n"
-            f"Details: {exeception}\n"
+            f"Details: {e}\n"
             f"TraceBack: \n\n{traceback.format_exc()}\n"
             f"Посилання: {message.text}"
         )

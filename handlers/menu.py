@@ -27,7 +27,8 @@ async def send_about_information(query: CallbackQuery, text: str) -> None:
         await query.message.edit_text(
             text=text, parse_mode="HTML", reply_markup=about()
         )
-    except:
+    except Exception as e:
+        print(f"SEND ABOUT INFORMATION: {e}\n USER STUPID PRESS THE SAME BUTTON")
         await query.answer(f"Ви уже переглядаєте {query.data}")
 
 
@@ -163,7 +164,7 @@ async def about_information(query: CallbackQuery):
 
 
 @router.message(F.text == "Підписка 👑")
-async def premium(message: Message):
+async def premium(message: Message, text=None):
     await message.delete()
     db = await Database.setup()
     telegram_id = message.from_user.id

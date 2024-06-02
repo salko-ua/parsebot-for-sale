@@ -1,6 +1,6 @@
 import datetime
 
-from aiogram import F, Router, types
+from aiogram import F, Router
 from aiogram.utils.media_group import MediaGroupBuilder
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
@@ -67,7 +67,8 @@ async def start(message: Message):
     media_group = MediaGroupBuilder(caption=caption)
     media_group.add_photo(
         type="photo",
-        media=r"https://img.freepik.com/premium-photo/on-a-black-surface-bright-multicolored-stickers-with-the-word-test_380694-1057.jpg?w=1800",
+        media=r"https://img.freepik.com/premium-photo/on-a-black-surface-bright-multicolored-stickers-with-the-word"
+              r"-test_380694-1057.jpg?w=1800",
     )
     await message.answer_media_group(media=media_group.build())
 
@@ -97,5 +98,4 @@ async def all_message(message: Message):
             "🔴 Вибачте, але мені потрібне тільки посилання на сторінку olx.ua з"
             " нерухомістю.\nУ форматі https://www.olx.ua/..."
         )
-
         await message.answer(text, disable_web_page_preview=True)
