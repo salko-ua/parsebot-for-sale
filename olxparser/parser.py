@@ -51,7 +51,7 @@ class Information:
         ]
 
         checklist = []
-        tags = soup.find("ul", class_="css-sfcl1s").find_all("p")
+        tags = soup.find("ul", class_="css-px7scb").find_all("p")
 
         for need_word in need_words_russian:
             for tag in tags:
