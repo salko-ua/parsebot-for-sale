@@ -3,7 +3,6 @@ from typing import Iterable
 
 from aiosqlite import Row
 from dateutil.relativedelta import relativedelta
-from control_db import Database
 from control_db.create_db import BaseDBPart
 
 
@@ -88,7 +87,6 @@ class PremiumUser(BaseDBPart):
         await self.base.commit()
 
     async def add_premium_user(self, telegram_id):
-        db = await Database.setup()
         telegram_id_exists = await (
             await self.cur.execute(
                 """SELECT COUNT(`telegram_id`) FROM `premium_user` WHERE telegram_id = ?""",
@@ -122,7 +120,7 @@ class PremiumUser(BaseDBPart):
             )
             return await self.base.commit()
 
-        if await db.is_premium_user(telegram_id):
+        if await self.is_premium_user(telegram_id):
             continue_data = (
                     datetime.strptime(expiration_date[0][0], "%d.%m.%Y") + relativedelta(months=1)
             ).strftime("%d.%m.%Y")
