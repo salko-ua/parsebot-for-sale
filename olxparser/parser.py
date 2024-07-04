@@ -135,15 +135,17 @@ class Information:
         pattern = re.compile(
             r"\b(?:" + "|".join(map(re.escape, words_to_remove)) + r")\b", re.IGNORECASE
         )
+        print(text)
 
         # Замінюємо відповідні слова на порожні рядки
         result = pattern.sub("", text)
+        print(result)
 
         return result
 
     def get_header(soup: BeautifulSoup) -> [str, str]:
         # parsing caption from the page
-        header = soup.find("h4", class_="css-1juynto")
+        header = soup.find("h4", class_="css-1kc83jo")
 
         if not header:
             return None
@@ -152,7 +154,7 @@ class Information:
 
     def get_caption(soup: BeautifulSoup) -> str:
         # parsing caption from the page
-        caption = soup.find("div", class_="css-1t507yq er34gjf0")
+        caption = soup.find("div", class_="css-1t507yq")
 
         if not caption:
             return "Описание не найдено"
@@ -242,6 +244,5 @@ async def get_data(message: types.Message):
             message_photo = await bot.send_media_group(chat_id=-1001902595324, message_thread_id=805, media=[photo_group[i]])
             await bot.delete_message(message_id=message_photo[0].message_id, chat_id=-1001902595324)
         except Exception as e:
-            print("remove", i , e)
             new_photo_group.remove(photo_group[i])
     await message.answer_media_group(media=new_photo_group)
