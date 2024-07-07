@@ -148,7 +148,7 @@ class Information:
         header = soup.find("h4", class_="css-1kc83jo")
 
         if not header:
-            return None
+            return "Заголовок не знайдено. Повідомте розробника про помилку."
 
         return header.text
 
@@ -157,7 +157,7 @@ class Information:
         caption = soup.find("div", class_="css-1t507yq")
 
         if not caption:
-            return "Описание не найдено"
+            return "Опис не знайдено. Повідомте розробника про помилку."
 
         if len(caption.text) > 800:
             return caption.text[0:800]
