@@ -154,7 +154,7 @@ class Information:
 
     def get_caption(soup: BeautifulSoup) -> str:
         # parsing caption from the page
-        caption = soup.find("div", class_="css-1t507yq")
+        caption = soup.find("div", class_="css-1o924a9")
 
         if not caption:
             return "Опис не знайдено. Повідомте розробника про помилку."
