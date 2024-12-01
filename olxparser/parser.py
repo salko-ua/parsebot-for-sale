@@ -10,10 +10,14 @@ from main import bot
 
 
 def get_url(url):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, "html.parser")
-    return soup
-
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, "html.parser")
+        return soup
+    except Exception as e:
+        response = requests.get(url)
+        raise (str(response) + "\n\n" + e)
 
 class Information:
     # Парсинг 10 перших фото
