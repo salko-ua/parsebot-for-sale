@@ -5,10 +5,10 @@ from main import bot
 import aiohttp
 
 from config import MERCHANT_ACCOUNT
-from control_db import Database
-from handlers.payments import check_status_invoice, get_payment_info
+from src.database import Database
+from src.handlers.payments import check_status_invoice, get_payment_info
 from main import scheduler
-from keyboards.premium import buy_premium_kb
+from src.keyboards.premium import buy_premium_kb
 
 
 async def check_all_invoice(lock):

@@ -3,10 +3,10 @@ import os
 import aiosqlite
 import asyncache
 
-from control_db.premium_operations import PremiumOperations
-from control_db.premium_user import PremiumUser
-from control_db.urls import UrlsDB
-from control_db.user import UserDB
+from src.database.premium_operations import PremiumOperations
+from src.database.premium_user import PremiumUser
+from src.database.urls import UrlsDB
+from src.database.user import UserDB
 
 
 class Database(UserDB, UrlsDB, PremiumOperations, PremiumUser):

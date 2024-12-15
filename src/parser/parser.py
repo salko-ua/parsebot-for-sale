@@ -1,6 +1,4 @@
 import re
-from ast import Await
-
 import requests
 from aiogram import types
 from aiogram.utils.media_group import MediaGroupBuilder

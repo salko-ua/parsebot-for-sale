@@ -6,9 +6,9 @@ from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
 import asyncio
 
-from control_db import Database
-from keyboards.menu import menu_kb
-from handlers.task import check_all_premium
+from src.database import Database
+from src.keyboards.menu import menu_kb
+from src.handlers.task import check_all_premium
 
 router = Router()
 

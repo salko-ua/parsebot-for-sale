@@ -10,9 +10,9 @@ from aiogram import F, Router
 from aiogram.types import CallbackQuery
 
 from config import MERCHANT_ACCOUNT, MERCHANT_DOMAIN_NAME, SECRET_KEY
-from control_db import Database
-from keyboards.menu import hide_kb
-from keyboards.premium import buy_url
+from src.database import Database
+from src.keyboards.menu import hide_kb
+from src.keyboards.premium import buy_url
 from main import bot
 
 router = Router()

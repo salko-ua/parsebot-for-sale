@@ -4,9 +4,9 @@ from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from control_db import Database
-from keyboards.menu import about, buy_premium, continue_premium, hide_kb
-from keyboards.premium import back
+from src.database import Database
+from src.keyboards.menu import about, buy_premium, continue_premium, hide_kb
+from src.keyboards.premium import back
 
 router = Router()
 

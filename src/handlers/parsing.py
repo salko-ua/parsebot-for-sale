@@ -3,8 +3,8 @@ from datetime import datetime
 from aiogram import Bot, F, Router
 from aiogram.types import Message
 
-from control_db import Database
-from olxparser.parser import get_data
+from src.database import Database
+from src.parser.parser import get_data
 
 router = Router()
 

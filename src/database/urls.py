@@ -1,4 +1,4 @@
-from control_db.create_db import BaseDBPart
+from src.database.create_db import BaseDBPart
 
 
 class UrlsDB(BaseDBPart):

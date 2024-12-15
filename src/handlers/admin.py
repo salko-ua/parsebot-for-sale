@@ -8,12 +8,12 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from config import ADMINS
-from control_db import Database
-from keyboards.admin import admin_kb, send_alarm
-from keyboards.menu import hide_kb
+from src.database import Database
+from src.keyboards.admin import admin_kb, send_alarm
+from src.keyboards.menu import hide_kb
 from main import bot
 from datetime import datetime
-from handlers.payments import generate_random_string
+from src.handlers.payments import generate_random_string
 
 router = Router()
 
