@@ -149,7 +149,7 @@ class Information:
 
     def get_header(soup: BeautifulSoup) -> [str, str]:
         # parsing caption from the page
-        header = soup.find("h4", class_="css-1kc83jo")
+        header = soup.find("h4", class_="css-yde3oc")
 
         if not header:
             return "Заголовок не знайдено. Повідомте розробника про помилку."
