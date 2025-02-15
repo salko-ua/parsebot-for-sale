@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import apykuma
 from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -43,8 +42,6 @@ async def start_bot():
     await task.create_tasks()
     await bot.delete_webhook(drop_pending_updates=True)
     print("Bot Online")
-    if KUMA_TOKEN != "":
-        await apykuma.start(url=KUMA_TOKEN, delay=10)
     await dp.start_polling(bot)
 
 

@@ -36,6 +36,8 @@
               python3Packages.aiohttp
               python3Packages.requests
               python3Packages.aiogram
+              python3Packages.sentry-sdk
+              python3Packages.apscheduler
               python3Packages.beautifulsoup4
               python3Packages.aiosqlite
             ] ++ python3Packages.fastapi.optional-dependencies.standard;

@@ -8,8 +8,6 @@ from bs4 import BeautifulSoup
 from bs4.element import Tag
 
 
-from main import bot
-
 
 class Parser:
     def __init__(self, url):
@@ -46,7 +44,7 @@ class Parser:
         return media_group.build()
 
     # Parse main information like (amount of rooms, floor, area, region)
-    def get_main_information(soup: BeautifulSoup) -> [str, str, str, str]:
+    def get_main_information(self):
         # constants to check the list "tags"
         need_words_ukrainian = [
             "Кількість кімнат:",
@@ -64,9 +62,9 @@ class Parser:
         checklist = []
 
         # find all span tags in div 
-        div_with_tags = soup.find("div", class_="css-41yf00")
+        div_with_tags = self.soup.find("div", class_="css-41yf00")
         if div_with_tags and isinstance(div_with_tags, Tag):
-            tags = div_with_tags.find_all("span")
+            tags = div_with_tags.find_all("p")
         else:
             tags = []
          
@@ -81,10 +79,11 @@ class Parser:
                 if need_word in tag.text:
                     checklist.append(tag.text)
         
+        
         # TODO переробити принцип
         try:
             if len(checklist) != 4:
-                rooms = re.search(r"\d+", checklist[0]).group()
+                rooms = re.search(r"\d+", checklist[0]).group() 
                 area = re.search(r"\d+", checklist[1]).group()
                 find_everything = re.search(r"\d+", checklist[2])
                 flour = f"{find_everything.group()}"
@@ -104,7 +103,7 @@ class Parser:
         
 
         # TODO можливо можна шукати одразу в find? 
-        find = soup.find_all("script")
+        find = self.soup.find_all("script")
         pattern_district = re.compile(r'\\"districtName\\":\\"([^\\"]+)\\"')
         pattern_city = re.compile(r'\\"cityName\\":\\"([^\\"]+)\\"')
         district, city = "", ""
@@ -126,23 +125,18 @@ class Parser:
 
     def get_price(self) -> str:
         # parsing price from the page
-        price = None
-        tags_can_be = ["h2", "h3", "h4", "h5", "h6"]
-        text_can_be = [re.compile(r".*грн.*"), re.compile(r".*\$.*")]
-        
-        ad_price_tag = self.soup.find("div", {"data-testid": "ad-price-container"})
-        print(ad_price_tag)
-
-        for tag in tags_can_be:
-            for text in text_can_be:
-                price = self.soup.find(tag, text=text)
-                if price:
-                    break
+          
+        price_parent = self.soup.find("div", {"data-testid": "ad-price-container"})
+        if price_parent and isinstance(price_parent, Tag):
+            price = price_parent.find(lambda tag: tag.name not in ['style', 'script'])
+            price = price.text if price else None
+        else:
+            price = None
 
         if not price:
             return "Суму не знайдено"
 
-        return price.text
+        return price
 
     def delete_words(self, text: str, words_to_remove: list) -> str:
         # Використовуємо регулярний вираз для визначення слова з можливими крапками
@@ -157,76 +151,56 @@ class Parser:
 
     def get_header(self) -> str:
         # parsing caption from the page
-        header = self.soup.find("h4", class_="css-yde3oc")
-        header_test = self.soup.find("div", {"data-testid": "ad_title"})
-        print(header_test)
+        header_parent = self.soup.find("div", {"data-testid": "ad_title"})
+        if header_parent and isinstance(header_parent, Tag):
+            header = header_parent.find(lambda tag: tag.name not in ['style', 'script'])
+            header = header.text if header else None
+        else:
+            header = None
+
         if not header:
             return "Заголовок не знайдено. Повідомте розробника про помилку."
 
-        return header.text
+        return header
 
     def get_caption(self) -> str:
-        # parsing caption from the page
-        caption = self.soup.find("div", class_="css-1o924a9")
-        caption_test = self.soup.find("div", {"data-testid": "ad_description"})
-        print(caption_test)
-        if not caption:
-            return "Опис не знайдено. Повідомте розробника про помилку."
+        # parsing caption parent
+        full_caption = self.soup.find("div", {"data-testid": "ad_description"})
+        
+        # get caption if he is exist
+        if full_caption and isinstance(full_caption, Tag):
+            caption = full_caption.find("div")
+            caption = caption.text if caption else None
+        else:
+            caption = None
+            
+        if caption is None:
+            return "Опис не знайдено."
 
-        if len(caption.text) > 800:
-            return caption.text[0:800]
-
-        return caption.text
+        if len(caption) > 800:
+            return caption[0:800]
+        print(caption)
+        return caption
 
     def create_caption(self) -> str:
         words = [
-            "Від",
-            "От",
-            "я собственник",
-            "я власнник",
-            "посредников",
-            "своя",
-            "свою",
-            "риелтор",
-            "риелторов",
-            "агентство",
-            "агент",
-            "маклер",
-            "посредник",
-            "личную",
-            "хозяин",
-            "собственник",
-            "собственника",
-            "хозяина",
-            "хозяйка",
-            "без комиссии",
-            "агента",
-            "агентства",
-            "собственников",
-            "посередників",
-            "своя",
-            "свою",
-            "ріелтор",
-            "ріелторів",
-            "агентство",
-            "агент",
-            "маклер",
-            "посередник",
-            "посередник",
-            "особисту",
-            "власник",
-            "власника",
-            "власників",
-            "хазяїнахазяйка",
-            "хазяйка",
-            "особисту",
-            "без комісії",
-            "Без рієлторів",
-            "комісій",
-            "Без риелторов",
-            "комисий",
-            "комісіЇ",
-            "комисии",
+            "Від", "От",
+            "я собственник", "я власнник",
+            "посредников", "своя", "свою",
+            "риелтор", "риелторов",
+            "агентство", "агент",
+            "маклер", "посредник", "личную",
+            "хозяин", "собственник", "собственника",
+            "хозяина", "хозяйка", "без комиссии",
+            "агента", "агентства", "собственников",
+            "посередників", "ріелтор", "ріелторів",
+            "агентство", "маклер", "посередник",
+            "посередник", "особисту", "власник",
+            "власника", "власників",
+            "хазяїн", "хазяйка", "особисту",
+            "без комісії", "без рієлторів",
+            "комісій", "Без риелторов",
+            "комисий", "комісіЇ", "комисии",
         ]
 
         caption = self.delete_words(self.get_caption(), words)
@@ -255,8 +229,8 @@ async def get_data(message: types.Message):
 
     for i in range(len(photo_group)):
         try:
-            message_photo = await bot.send_media_group(chat_id=-1001902595324, message_thread_id=805, media=[photo_group[i]])
-            await bot.delete_message(message_id=message_photo[0].message_id, chat_id=-1001902595324)
+            message_photo = await message.bot.send_media_group(chat_id=-1001902595324, message_thread_id=805, media=[photo_group[i]])
+            await message.bot.delete_message(message_id=message_photo[0].message_id, chat_id=-1001902595324)
         except Exception as e:
             new_photo_group.remove(photo_group[i])
     await message.answer_media_group(media=new_photo_group)
