@@ -5,9 +5,6 @@ from aiogram.utils.media_group import MediaGroupBuilder
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 
-from main import bot
-
-
 class Parser:
     def __init__(self, url):
         self.url = url
@@ -154,7 +151,7 @@ class Parser:
                     checklist.append(tag.text)
         
         
-        # TODO переробити принцип
+        # TODO переробити принцип 
         try:
             if len(checklist) != 4:
                 rooms = re.search(r"\d+", checklist[0]).group() 
@@ -276,10 +273,11 @@ async def get_data(message: types.Message):
 
 
     # check photo is alright
+    assert message.bot is not None
     for index in range(len(parser.images)):
         try:
-           message_photo = await bot.send_media_group(chat_id=-1001902595324, message_thread_id=805, media=[parser.images[index]])
-           await bot.delete_message(message_id=message_photo[0].message_id, chat_id=-1001902595324)
+           message_photo = await message.bot.send_media_group(chat_id=-1001902595324, message_thread_id=805, media=[parser.images[index]])
+           await message.bot.delete_message(message_id=message_photo[0].message_id, chat_id=-1001902595324)
         except:
            parser.images.remove(parser.images[index])
 

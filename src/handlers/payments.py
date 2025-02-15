@@ -9,11 +9,11 @@ import aiohttp
 from aiogram import F, Router
 from aiogram.types import CallbackQuery
 
-from config import MERCHANT_ACCOUNT, MERCHANT_DOMAIN_NAME, SECRET_KEY
-from control_db import Database
-from keyboards.menu import hide_kb
-from keyboards.premium import buy_url
-from main import bot
+from src.config import MERCHANT_ACCOUNT, MERCHANT_DOMAIN_NAME, SECRET_KEY
+from src.control_db import Database
+from src.keyboards.menu import hide_kb
+from src.keyboards.premium import buy_url
+from src.__main__ import bot
 
 router = Router()
 
@@ -162,6 +162,7 @@ async def get_payment_info(order_reference: str, merchant_account: str) -> Check
 @router.callback_query(F.data == "Продовжити підписку 💳")
 @router.callback_query(F.data == "Придбати підписку 💳")
 async def payment(query: CallbackQuery, message=None):
+    assert message is not None
     db = await Database.setup()
     amount = 300
     currency = "UAH"

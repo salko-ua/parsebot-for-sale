@@ -7,13 +7,12 @@ from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from config import ADMINS
-from control_db import Database
-from keyboards.admin import admin_kb, send_alarm
-from keyboards.menu import hide_kb
-from main import bot
+from src.config import ADMINS
+from src.control_db import Database
+from src.keyboards.admin import admin_kb, send_alarm
+from src.keyboards.menu import hide_kb
 from datetime import datetime
-from handlers.payments import generate_random_string
+from src.handlers.payments import generate_random_string
 
 router = Router()
 
@@ -27,15 +26,19 @@ class SendNews(StatesGroup):
 
 @router.message(F.text == "db")
 async def send_file_db(message: Message):
+    assert message.from_user is not None;
+    assert message.bot is not None
     if not (message.from_user.id in ADMINS):
         return
 
     file_path = types.FSInputFile("data/database.db")
-    await bot.send_document(message.from_user.id, file_path)
+    await message.bot.send_document(message.from_user.id, file_path)
 
 
 @router.message(Command("admin"))
 async def admin(message: Message):
+    assert message.from_user is not None
+
     if message.from_user.id in ADMINS:
         await message.delete()
         await message.answer("Ось ваша клавіатура ⬇️", reply_markup=admin_kb())
@@ -43,6 +46,9 @@ async def admin(message: Message):
 
 @router.message(F.text.startswith("add"))
 async def add_fucking_stupid_people(message: Message):
+    assert message.from_user is not None
+    assert message.text is not None
+    assert message.bot is not None
     if message.from_user.id not in ADMINS:
         return
 
@@ -51,21 +57,22 @@ async def add_fucking_stupid_people(message: Message):
 
     await db.add_premium_user(data[1])
     await db.update_premium_operations(
-        telegram_id=data[1],
+        telegram_id=int(data[1]),
         message_id=message.message_id,
         order_reference=generate_random_string(12),
         order_date=int(datetime.now().replace(hour=0, minute=0, second=0).timestamp()),
         reason_code=1100,
         transaction_status="Approved",
-        price=data[2],
+        price=int(data[2]),
     )
+
     # [N] NOTIFY ADMINISTRATOR
-    await bot.send_message(
+    await message.bot.send_message(
         chat_id=-1001902595324,
         message_thread_id=392,
         text=f"Оплата пройшла успішно @{await db.get_username(data[1])} {data[1]}\nКод оплати: 1100\nТип: Особиста оплата",
     )
-    await bot.send_message(
+    await message.bot.send_message(
         text=f"Підписка {data[1]} додалась 🟩",
         chat_id=-1001902595324,
         message_thread_id=481,
@@ -74,14 +81,14 @@ async def add_fucking_stupid_people(message: Message):
     # [N] CHECK NEW OR OLD USER AND SEND NOTIFY
     if await db.get_bought_premium(data[1]) > 1:
         expiration_date = await db.get_expiration_date(data[1])
-        await bot.send_message(
+        await message.bot.send_message(
             chat_id=data[1],
             text=f"Дякую за підписку, її продовження до {expiration_date}",
             reply_markup=hide_kb(),
         )
         return
     expiration_date = await db.get_expiration_date(data[1])
-    await bot.send_message(
+    await message.bot.send_message(
         chat_id=data[1],
         text=f"Дякую за підписку, вона діятиме до {expiration_date}",
         reply_markup=hide_kb(),
@@ -90,6 +97,7 @@ async def add_fucking_stupid_people(message: Message):
 
 @router.message(F.text == "Всі Користувачі 👥")
 async def all_people_from_db(message: Message):
+    assert message.from_user is not None
     if message.from_user.id not in ADMINS:
         return
     await message.delete()
@@ -112,6 +120,7 @@ async def all_people_from_db(message: Message):
 
 @router.message(F.text == "Всі Користувачі 👑")
 async def all_premium_from_db(message: Message):
+    assert message.from_user is not None
     if message.from_user.id not in ADMINS:
         return
     await message.delete()
@@ -138,6 +147,7 @@ async def all_premium_from_db(message: Message):
 
 @router.message(F.text == "Користувачі що не мали 👑")
 async def people_ex(message: Message):
+    assert message.from_user is not None
     if message.from_user.id not in ADMINS:
         return
     await message.delete()
@@ -160,6 +170,7 @@ async def people_ex(message: Message):
 
 @router.message(F.text == "Статистика 📊")
 async def stats(message: Message):
+    assert message.from_user is not None
     await message.delete()
     if message.from_user.id not in ADMINS:
         return
@@ -169,6 +180,10 @@ async def stats(message: Message):
     operation_1day = await db.get_stats_from_operation(1)
     operation_7days = await db.get_stats_from_operation(7)
     operation_30days = await db.get_stats_from_operation(30)
+    assert operations is not None
+    assert operation_1day is not None
+    assert operation_7days is not None
+    assert operation_30days is not None
 
     stats_all_time = {"count": operations[0], "sum": operations[1]}
     stats_1day = {"count": operation_1day[0], "sum": operation_1day[1]}
@@ -202,6 +217,7 @@ async def stats(message: Message):
 
 @router.message(F.text == "Розсилка 📢")
 async def alarm(message: Message):
+    assert message.from_user is not None
     if message.from_user.id not in ADMINS:
         return
 
@@ -232,12 +248,14 @@ async def send_message_single(message: Message, state: FSMContext):
 
 
 @router.message(SendNews.send_message_finish, F.text)
-async def send_mixed_news2(message: Message, state: FSMContext):
+async def send_news_users(message: Message, state: FSMContext):
+    assert message.bot is not None
+    assert message.text is not None
     data = await state.get_data()
     message_text = data["message"]
     await state.clear()
     try:
-        await bot.send_message(
+        await message.bot.send_message(
             chat_id=message.text, text=f"Адміністратор бота написав: \n{message_text}"
         )
         await message.answer("Повідомлення надіслано")
@@ -253,7 +271,7 @@ async def send_alarm_premium(query: CallbackQuery, state: FSMContext):
 
 
 @router.message(SendNews.send_news_premium, F.text)
-async def send_mixed_news2(message: Message, state: FSMContext):
+async def send_news_premium(message: Message, state: FSMContext):
     db = await Database.setup()
     await state.clear()
 
@@ -263,7 +281,7 @@ async def send_mixed_news2(message: Message, state: FSMContext):
         await message.answer("Немає людей з підпискою")
         return
 
-    await asyncio.gather(*map(send_notification(message.text), premium_user_ids))
+    await asyncio.gather(*map(send_notification(message), premium_user_ids))
 
     await message.answer("Надсилання закінчено!")
 
@@ -279,15 +297,18 @@ async def send_mixed_news2(message: Message, state: FSMContext):
         await message.answer("у боті немає людей")
         return
 
-    await asyncio.gather(*map(send_notification(message.text), user_ids))
+    await asyncio.gather(*map(send_notification(message), user_ids))
 
     await message.answer("Надсилання закінчено!")
 
 
-def send_notification(text: str):
+def send_notification(message: Message):
+    assert message.bot is not None
+    assert message.text is not None
+    assert message is not None
     async def wrapped(user_id: int):
         try:
-            await bot.send_message(user_id, text)
+            await message.bot.send_message(user_id, text=message.text)
         except:
             pass
 

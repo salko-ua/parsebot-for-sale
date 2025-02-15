@@ -4,12 +4,11 @@ from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from control_db import Database
-from keyboards.menu import about, buy_premium, continue_premium, hide_kb
-from keyboards.premium import back
+from src.control_db import Database
+from src.keyboards.menu import about, buy_premium, continue_premium, hide_kb
+from src.keyboards.premium import back
 
 router = Router()
-
 
 class SendFAQ(StatesGroup):
     send_message = State()
@@ -17,7 +16,7 @@ class SendFAQ(StatesGroup):
 
 @router.message(Command("about"))
 @router.message(F.text == "Інформація 🧾")
-async def information(message: Message):
+async def informations(message: Message):
     await message.delete()
     await message.answer("Що вас цікавить ?", reply_markup=about())
 

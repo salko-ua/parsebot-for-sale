@@ -7,7 +7,7 @@ from aiogram.types import (
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 
-def admin_kb() -> ReplyKeyboardMarkup:
+def admin_kb() -> ReplyKeyboardMarkup | InlineKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
 
     keyboard = [
@@ -24,7 +24,7 @@ def admin_kb() -> ReplyKeyboardMarkup:
     return builder.adjust(2).as_markup(resize_keyboard=True)
 
 
-def send_alarm() -> InlineKeyboardMarkup:
+def send_alarm() -> ReplyKeyboardMarkup | InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     keyboard = ["Всім 👥", "Особисто 👤", "Преміум 👑"]

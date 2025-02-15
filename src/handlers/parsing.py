@@ -2,9 +2,10 @@ import traceback
 from datetime import datetime
 from aiogram import Bot, F, Router
 from aiogram.types import Message
+from pydantic import NonNegativeFloat
 
 from control_db import Database
-from olxparser.parser import get_data
+from src.olx_api import get_data
 
 router = Router()
 
@@ -13,6 +14,8 @@ router = Router()
 @router.message(F.text.startswith("https://olx.ua/"))
 @router.message(F.text.startswith("https://m.olx.ua/"))
 async def main(message: Message, bot: Bot):
+    assert message.from_user is not None
+    assert message.text is not None
     db = await Database.setup()
     date = datetime.now().timestamp()
     telegram_id = message.from_user.id

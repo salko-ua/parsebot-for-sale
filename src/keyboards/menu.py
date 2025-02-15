@@ -7,7 +7,7 @@ from aiogram.types import (
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 
-def menu_kb() -> ReplyKeyboardMarkup:
+def menu_kb() -> ReplyKeyboardMarkup | InlineKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
 
     keyboard = ["Інформація 🧾", "Підписка 👑", "Посилання 🔗", "Зворт зв`язок 👤"]
@@ -18,7 +18,7 @@ def menu_kb() -> ReplyKeyboardMarkup:
     return builder.adjust(2).as_markup(resize_keyboard=True)
 
 
-def about() -> InlineKeyboardMarkup:
+def about() -> ReplyKeyboardMarkup | InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     keyboard = [
@@ -37,7 +37,7 @@ def about() -> InlineKeyboardMarkup:
     return builder.adjust(2).as_markup(resize_keyboard=True)
 
 
-def hide_kb() -> InlineKeyboardMarkup:
+def hide_kb() -> ReplyKeyboardMarkup | InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     keyboard = ["Сховати ❌"]
@@ -48,7 +48,7 @@ def hide_kb() -> InlineKeyboardMarkup:
     return builder.adjust(2).as_markup(resize_keyboard=True)
 
 
-def continue_premium() -> InlineKeyboardMarkup:
+def continue_premium() -> ReplyKeyboardMarkup | InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     keyboard = ["Продовжити підписку 💳", "Сховати ❌"]
@@ -59,7 +59,7 @@ def continue_premium() -> InlineKeyboardMarkup:
     return builder.adjust(1).as_markup(resize_keyboard=True)
 
 
-def buy_premium() -> InlineKeyboardMarkup:
+def buy_premium() -> ReplyKeyboardMarkup | InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     keyboard = ["Придбати підписку 💳", "Сховати ❌"]

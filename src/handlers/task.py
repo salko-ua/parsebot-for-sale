@@ -1,6 +1,5 @@
 import asyncio
 from datetime import datetime, timedelta
-from main import bot
 
 import aiohttp
 
@@ -9,6 +8,7 @@ from control_db import Database
 from handlers.payments import check_status_invoice, get_payment_info
 from keyboards.premium import buy_premium_kb
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from src.__main__ import bot
 
 scheduler = AsyncIOScheduler(timezone="Europe/Kiev")
 

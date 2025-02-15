@@ -1,12 +1,13 @@
 import asyncio
 import logging
-from aiogram import Bot, Dispatcher
-
-from config import TOKEN, SENTRY_SDK
-from middleware import CheckConnectioError, CheckPrivateChat
-
-from src.handlers import admin, menu, parsing, payments, task, telegram
 import sentry_sdk
+
+from aiogram import Bot, Dispatcher
+from src.config import TOKEN, SENTRY_SDK
+
+bot = Bot(token=TOKEN)
+from src.middleware import CheckConnectioError, CheckPrivateChat
+from src.handlers import admin, menu, parsing, payments, task, telegram
 
 sentry_sdk.init(
     dsn=SENTRY_SDK,
@@ -33,7 +34,6 @@ async def register_handlers(dp: Dispatcher):
 
 
 async def start_bot():
-    bot = Bot(token=TOKEN)
     dp = Dispatcher()
 
     await register_handlers(dp)

@@ -1,8 +1,8 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def buy_premium_kb(chose: bool) -> InlineKeyboardMarkup:
+def buy_premium_kb(chose: bool) -> InlineKeyboardMarkup | ReplyKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     if chose:
@@ -16,7 +16,7 @@ def buy_premium_kb(chose: bool) -> InlineKeyboardMarkup:
     return builder.adjust(1).as_markup(resize_keyboard=True)
 
 
-def buy_url(url: str, order_reference: str) -> InlineKeyboardMarkup:
+def buy_url(url: str, order_reference: str) -> InlineKeyboardMarkup | ReplyKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     builder.add(InlineKeyboardButton(text="Оплатити", url=url))
@@ -30,7 +30,7 @@ def buy_url(url: str, order_reference: str) -> InlineKeyboardMarkup:
     return builder.adjust(1).as_markup(resize_keyboard=True)
 
 
-def back() -> InlineKeyboardMarkup:
+def back() -> InlineKeyboardMarkup | ReplyKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     keyboard = ["Відмінити ❌"]

@@ -1,6 +1,7 @@
 import os
 
-TOKEN = os.environ["TEST_TOKEN"]
+#TOKEN = os.environ["TEST_TOKEN"]
+TOKEN = "7474496771:AAGsJjBLGWhg4s69kS54_S7RXbdqSBO5Lrk"
 SECRET_KEY = os.environ["SECRET_KEY"]
 KUMA_TOKEN = os.environ.get("KUMA_TOKEN", "")
 ADMINS = [2138964363, 348596474]
