@@ -1,24 +1,10 @@
 import asyncio
 import logging
-import sentry_sdk
-
-from aiogram import Bot, Dispatcher
-from src.config import TOKEN, SENTRY_SDK
-
-bot = Bot(token=TOKEN)
+from aiogram import Dispatcher
 from src.middleware import CheckConnectioError, CheckPrivateChat
 from src.handlers import admin, menu, parsing, payments, task, telegram
 
-sentry_sdk.init(
-    dsn=SENTRY_SDK,
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    traces_sample_rate=1.0,
-    # Set profiles_sample_rate to 1.0 to profile 100%
-    # of sampled transactions.
-    # We recommend adjusting this value in production.
-    profiles_sample_rate=1.0,
-)
+from src.global_variable import bot, dp
 
 
 async def register_handlers(dp: Dispatcher):
@@ -34,7 +20,6 @@ async def register_handlers(dp: Dispatcher):
 
 
 async def start_bot():
-    dp = Dispatcher()
 
     await register_handlers(dp)
     await task.create_tasks()

@@ -2,9 +2,8 @@ import traceback
 from datetime import datetime
 from aiogram import Bot, F, Router
 from aiogram.types import Message
-from pydantic import NonNegativeFloat
 
-from control_db import Database
+from src.control_db import Database
 from src.olx_api import get_data
 
 router = Router()

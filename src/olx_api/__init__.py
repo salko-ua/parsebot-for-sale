@@ -199,7 +199,7 @@ class Parser:
         self.update_full_caption()
 
     # Parse first 10 photo
-    def reset_photo(self, caption: str) -> None:
+    def reset_photo(self) -> None:
         # find all images tags in div
         wrapper = self.soup.find("div", class_="swiper-wrapper")
         if wrapper and isinstance(wrapper, Tag):
@@ -209,7 +209,7 @@ class Parser:
         
         # list with photo urls
         list_src_photo = []
-        media_group = MediaGroupBuilder(caption=caption)
+        media_group = MediaGroupBuilder(caption=self.full_caption)
         
         # add urls to list
         for src in images:
@@ -225,7 +225,6 @@ class Parser:
         
         # save images
         self.images = media_group.build() 
-        self.update_full_caption()
 
     def update_full_caption(self) -> None:
         words = [
@@ -257,28 +256,31 @@ class Parser:
         main_caption = f"💳️{self.price}" f"\n\n{self.header}\n\n" f"📝Опис:\n{self.caption}"
 
         self.full_caption = captions + main_caption
+        self.reset_photo()
 
     def reset_all(self) -> None:
         self.reset_header()
         self.reset_caption()
         self.reset_price()
         self.reset_main_information()
-        self.reset_photo(self.caption)
         self.update_full_caption()
 
 # Отримання всіх даних і запуск надсилання
 async def get_data(message: types.Message):
     parser = Parser(url=message.text)
     parser.reset_all()
+    print(parser.full_caption)
 
 
     # check photo is alright
+    new_list = parser.images.copy()
     assert message.bot is not None
     for index in range(len(parser.images)):
         try:
            message_photo = await message.bot.send_media_group(chat_id=-1001902595324, message_thread_id=805, media=[parser.images[index]])
            await message.bot.delete_message(message_id=message_photo[0].message_id, chat_id=-1001902595324)
         except:
-           parser.images.remove(parser.images[index])
+           new_list.remove(parser.images[index])
+    parser.images = new_list
 
-    await message.answer_media_group(media=parser.images, caption=parser.full_caption)
+    await message.answer_media_group(media=parser.images, caption=parser.full_caption, parse_mode="html")

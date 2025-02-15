@@ -1,4 +1,4 @@
-from control_db.create_db import BaseDBPart
+from src.control_db.create_db import BaseDBPart
 
 
 class UserDB(BaseDBPart):

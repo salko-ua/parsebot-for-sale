@@ -3,7 +3,7 @@ from typing import Iterable
 
 from aiosqlite import Row
 
-from control_db.create_db import BaseDBPart
+from src.control_db.create_db import BaseDBPart
 
 
 class PremiumOperations(BaseDBPart):

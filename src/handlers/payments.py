@@ -13,7 +13,7 @@ from src.config import MERCHANT_ACCOUNT, MERCHANT_DOMAIN_NAME, SECRET_KEY
 from src.control_db import Database
 from src.keyboards.menu import hide_kb
 from src.keyboards.premium import buy_url
-from src.__main__ import bot
+from src.global_variable import bot
 
 router = Router()
 

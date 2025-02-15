@@ -40,6 +40,7 @@
               python3Packages.apscheduler
               python3Packages.beautifulsoup4
               python3Packages.aiosqlite
+              python3Packages.dateutil
             ] ++ python3Packages.fastapi.optional-dependencies.standard;
           PYTHONPATH = ".";
         };

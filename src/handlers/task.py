@@ -3,14 +3,12 @@ from datetime import datetime, timedelta
 
 import aiohttp
 
-from config import MERCHANT_ACCOUNT
-from control_db import Database
-from handlers.payments import check_status_invoice, get_payment_info
-from keyboards.premium import buy_premium_kb
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from src.__main__ import bot
+from src.config import MERCHANT_ACCOUNT
+from src.control_db import Database
+from src.handlers.payments import check_status_invoice, get_payment_info
+from src.keyboards.premium import buy_premium_kb
+from src.global_variable import bot, scheduler
 
-scheduler = AsyncIOScheduler(timezone="Europe/Kiev")
 
 
 async def check_all_invoice(lock):
