@@ -7,8 +7,10 @@ import aiohttp
 from config import MERCHANT_ACCOUNT
 from control_db import Database
 from handlers.payments import check_status_invoice, get_payment_info
-from main import scheduler
 from keyboards.premium import buy_premium_kb
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+scheduler = AsyncIOScheduler(timezone="Europe/Kiev")
 
 
 async def check_all_invoice(lock):

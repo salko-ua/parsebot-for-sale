@@ -1,12 +1,11 @@
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from config import TOKEN, SENTRY_SDK, KUMA_TOKEN
+from config import TOKEN, SENTRY_SDK
 from middleware import CheckConnectioError, CheckPrivateChat
 
-from import admin, menu, parsing, payments, task, telegram
+from src.handlers import admin, menu, parsing, payments, task, telegram
 import sentry_sdk
 
 sentry_sdk.init(
@@ -35,7 +34,6 @@ async def register_handlers(dp: Dispatcher):
 
 async def start_bot():
     bot = Bot(token=TOKEN)
-    scheduler = AsyncIOScheduler(timezone="Europe/Kiev")
     dp = Dispatcher()
 
     await register_handlers(dp)
