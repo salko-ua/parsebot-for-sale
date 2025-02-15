@@ -14,37 +14,112 @@ class Parser:
         self.url = url
         self.response = requests.get(url)
         self.soup = BeautifulSoup(self.response.content, "html.parser")
+        self.images = []
+        self.amount_of_rooms = ""
+        self.floor = ""
+        self.area = ""
+        self.district = ""
+        self.price = ""
+        self.header = ""
+        self.caption = ""
+        self.full_caption = ""
 
-    # Parse first 10 photo
-    def get_photo(self, caption: str) -> list:
-        # find all images tags in div
-        wrapper = self.soup.find("div", class_="swiper-wrapper")
-        if wrapper and isinstance(wrapper, Tag):
-            images = wrapper.find_all("img")
+    def update_amount_of_rooms(self, update_to: str) -> None:
+        self.amount_of_rooms = update_to
+        self.update_full_caption()
+
+    def update_floor(self, update_to: str) -> None:
+        self.floor = update_to
+        self.update_full_caption()
+
+    def update_area(self, update_to: str) -> None:
+        self.area = update_to
+        self.update_full_caption()
+
+    def update_district(self, update_to: str) -> None:
+        self.district = update_to
+        self.update_full_caption()
+
+    def update_price(self, update_to: str) -> None:
+        self.price = update_to
+        self.update_full_caption()
+    
+    def update_header(self, update_to: str) -> None:
+        self.header = update_to
+        self.update_full_caption()
+
+    def update_caption(self, update_to: str) -> None:
+        self.caption = update_to
+        self.update_full_caption()
+
+    def delete_words(self, text: str, words_to_remove: list) -> str:
+        # Використовуємо регулярний вираз для визначення слова з можливими крапками
+        pattern = re.compile(
+            r"\b(?:" + "|".join(map(re.escape, words_to_remove)) + r")\b", re.IGNORECASE
+        )
+
+        # Замінюємо відповідні слова на порожні рядки
+        result = pattern.sub("", text)
+
+        return result
+
+    def reset_header(self) -> None:
+        # parsing caption from the page
+        header_parent = self.soup.find("div", {"data-testid": "ad_title"})
+        if header_parent and isinstance(header_parent, Tag):
+            header = header_parent.find(lambda tag: tag.name not in ['style', 'script'])
+            header = header.text if header else None
         else:
-            images = []
+            header = None
+
+        if not header:
+            self.header = "Заголовок не знайдено. Повідомте розробника про помилку."
+            return None
+
+        self.header = header
+        self.update_full_caption()
+
+    def reset_caption(self) -> None:
+        # parsing caption parent
+        full_caption = self.soup.find("div", {"data-testid": "ad_description"})
         
-        # list with photo urls
-        list_src_photo = []
-        media_group = MediaGroupBuilder(caption=caption)
-        
-        # add urls to list
-        for src in images:
-            list_src_photo.append(src.get("src"))
-        
-        # if images more then 10 cut to 10
-        if len(list_src_photo) > 10:
-            del list_src_photo[10:]
-        
-        # add images_url to media_group
-        for photo_url in list_src_photo:
-            media_group.add_photo(media=photo_url)
-        
-        # return media_group (aiogram object)
-        return media_group.build()
+        # get caption if he is exist
+        if full_caption and isinstance(full_caption, Tag):
+            caption = full_caption.find("div")
+            caption = caption.text if caption else None
+        else:
+            caption = None
+            
+        if caption is None:
+            self.caption = "Опис не знайдено."
+            return
+
+        if len(caption) > 800:
+            self.caption = caption[0:800]
+            return
+
+        self.caption = caption
+        self.update_full_caption()
+
+    def reset_price(self) -> None:
+        # parsing price from the page
+          
+        price_parent = self.soup.find("div", {"data-testid": "ad-price-container"})
+        if price_parent and isinstance(price_parent, Tag):
+            price = price_parent.find(lambda tag: tag.name not in ['style', 'script'])
+            price = price.text if price else None
+        else:
+            price = None
+
+        if not price:
+            self.price = "Суму не знайдено"
+            return
+
+        self.price = price
+        self.update_full_caption()
 
     # Parse main information like (amount of rooms, floor, area, region)
-    def get_main_information(self):
+    def reset_main_information(self) -> None:
         # constants to check the list "tags"
         need_words_ukrainian = [
             "Кількість кімнат:",
@@ -86,15 +161,15 @@ class Parser:
                 rooms = re.search(r"\d+", checklist[0]).group() 
                 area = re.search(r"\d+", checklist[1]).group()
                 find_everything = re.search(r"\d+", checklist[2])
-                flour = f"{find_everything.group()}"
+                floor = f"{find_everything.group()}"
             else:
                 rooms = re.search(r"\d+", checklist[0]).group()
                 area = re.search(r"\d+", checklist[1]).group()
                 find_have = re.search(r"\d+", checklist[2])
                 find_everything = re.search(r"\d+", checklist[3])
-                flour = f"{find_have.group()} з {find_everything.group()}"
+                floor = f"{find_have.group()} з {find_everything.group()}"
         except:
-            rooms, area, flour = "", "", ""
+            rooms, area, floor = "", "", ""
 
         # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -121,68 +196,42 @@ class Parser:
         else:
             district = ""
 
-        return rooms, flour, area, district
+        self.amount_of_rooms = rooms
+        self.floor = floor
+        self.area = area
+        self.district = district
+        self.update_full_caption()
 
-    def get_price(self) -> str:
-        # parsing price from the page
-          
-        price_parent = self.soup.find("div", {"data-testid": "ad-price-container"})
-        if price_parent and isinstance(price_parent, Tag):
-            price = price_parent.find(lambda tag: tag.name not in ['style', 'script'])
-            price = price.text if price else None
+    # Parse first 10 photo
+    def reset_photo(self, caption: str) -> None:
+        # find all images tags in div
+        wrapper = self.soup.find("div", class_="swiper-wrapper")
+        if wrapper and isinstance(wrapper, Tag):
+            images = wrapper.find_all("img")
         else:
-            price = None
-
-        if not price:
-            return "Суму не знайдено"
-
-        return price
-
-    def delete_words(self, text: str, words_to_remove: list) -> str:
-        # Використовуємо регулярний вираз для визначення слова з можливими крапками
-        pattern = re.compile(
-            r"\b(?:" + "|".join(map(re.escape, words_to_remove)) + r")\b", re.IGNORECASE
-        )
-
-        # Замінюємо відповідні слова на порожні рядки
-        result = pattern.sub("", text)
-
-        return result
-
-    def get_header(self) -> str:
-        # parsing caption from the page
-        header_parent = self.soup.find("div", {"data-testid": "ad_title"})
-        if header_parent and isinstance(header_parent, Tag):
-            header = header_parent.find(lambda tag: tag.name not in ['style', 'script'])
-            header = header.text if header else None
-        else:
-            header = None
-
-        if not header:
-            return "Заголовок не знайдено. Повідомте розробника про помилку."
-
-        return header
-
-    def get_caption(self) -> str:
-        # parsing caption parent
-        full_caption = self.soup.find("div", {"data-testid": "ad_description"})
+            images = []
         
-        # get caption if he is exist
-        if full_caption and isinstance(full_caption, Tag):
-            caption = full_caption.find("div")
-            caption = caption.text if caption else None
-        else:
-            caption = None
-            
-        if caption is None:
-            return "Опис не знайдено."
+        # list with photo urls
+        list_src_photo = []
+        media_group = MediaGroupBuilder(caption=caption)
+        
+        # add urls to list
+        for src in images:
+            list_src_photo.append(src.get("src"))
+        
+        # if images more then 10 cut to 10
+        if len(list_src_photo) > 10:
+            del list_src_photo[10:]
+        
+        # add images_url to media_group
+        for photo_url in list_src_photo:
+            media_group.add_photo(media=photo_url)
+        
+        # save images
+        self.images = media_group.build() 
+        self.update_full_caption()
 
-        if len(caption) > 800:
-            return caption[0:800]
-        print(caption)
-        return caption
-
-    def create_caption(self) -> str:
+    def update_full_caption(self) -> None:
         words = [
             "Від", "От",
             "я собственник", "я власнник",
@@ -203,34 +252,35 @@ class Parser:
             "комисий", "комісіЇ", "комисии",
         ]
 
-        caption = self.delete_words(self.get_caption(), words)
-        header = self.delete_words(self.get_header(), words)
-
-        rooms, flour, area, district = self.get_main_information()
-        money = self.get_price()
+        self.caption = self.delete_words(self.caption, words)
+        self.header = self.delete_words(self.header, words)
 
         captions = (
-            f"🏡{rooms}к кв\n" f"🏢Поверх: {flour}\n" f"🔑Площа: {area}м2\n" f"📍Район: {district}\n"
+            f"🏡{self.amount_of_rooms}к кв\n" f"🏢Поверх: {self.floor}\n" f"🔑Площа: {self.area}м2\n" f"📍Район: {self.district}\n"
         )
+        main_caption = f"💳️{self.price}" f"\n\n{self.header}\n\n" f"📝Опис:\n{self.caption}"
 
-        main_caption = f"💳️{money}" f"\n\n{header}\n\n" f"📝Опис:\n{caption}"
-        if not rooms != "":
-            return main_caption
-        return captions + main_caption
+        self.full_caption = captions + main_caption
 
+    def reset_all(self) -> None:
+        self.reset_header()
+        self.reset_caption()
+        self.reset_price()
+        self.reset_main_information()
+        self.reset_photo(self.caption)
+        self.update_full_caption()
 
 # Отримання всіх даних і запуск надсилання
 async def get_data(message: types.Message):
-    soup = Parser(message.text)
-    caption = soup.create_caption()
-    photo_group = soup.get_photo(caption)
-    new_photo_group = photo_group.copy()
+    parser = Parser(url=message.text)
+    parser.reset_all()
 
 
-    for i in range(len(photo_group)):
+    # check photo is alright
+    for index in range(len(parser.images)):
         try:
-            message_photo = await message.bot.send_media_group(chat_id=-1001902595324, message_thread_id=805, media=[photo_group[i]])
-            await message.bot.delete_message(message_id=message_photo[0].message_id, chat_id=-1001902595324)
+           message_photo = await message.bot.send_media_group(chat_id=-1001902595324, message_thread_id=805, media=[parser.images[index]])
+           await message.bot.delete_message(message_id=message_photo[0].message_id, chat_id=-1001902595324)
         except Exception as e:
-            new_photo_group.remove(photo_group[i])
+           parser.images.remove(parser.images[index])
     await message.answer_media_group(media=new_photo_group)
