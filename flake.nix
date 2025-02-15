@@ -35,6 +35,8 @@
               python3Packages.pytest
               python3Packages.aiohttp
               python3Packages.requests
+              python3Packages.aiogram
+              python3Packages.beautifulsoup4
               python3Packages.aiosqlite
             ] ++ python3Packages.fastapi.optional-dependencies.standard;
           PYTHONPATH = ".";

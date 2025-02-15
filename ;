@@ -5,8 +5,6 @@ import requests
 from aiogram import types
 from aiogram.utils.media_group import MediaGroupBuilder
 from bs4 import BeautifulSoup
-from bs4.element import Tag
-
 
 from main import bot
 
@@ -17,35 +15,25 @@ class Parser:
         self.response = requests.get(url)
         self.soup = BeautifulSoup(self.response.content, "html.parser")
 
-    # Parse first 10 photo
-    def get_photo(self, caption: str) -> list:
-        # find all images tags in div
-        wrapper = self.soup.find("div", class_="swiper-wrapper")
-        if wrapper and isinstance(wrapper, Tag):
-            images = wrapper.find_all("img")
-        else:
-            images = []
-        
-        # list with photo urls
+    # Парсинг 10 перших фото
+    def get_photo(soup: BeautifulSoup, caption: str) -> list:
+        photo = soup.find("div", class_="swiper-wrapper")
+
         list_src_photo = []
         media_group = MediaGroupBuilder(caption=caption)
-        
-        # add urls to list
-        for src in images:
+
+        for src in photo:
             list_src_photo.append(src.get("src"))
-        
-        # if images more then 10 cut to 10
+
         if len(list_src_photo) > 10:
             del list_src_photo[10:]
-        
-        # add images_url to media_group
+
         for photo_url in list_src_photo:
             media_group.add_photo(media=photo_url)
-        
-        # return media_group (aiogram object)
+
         return media_group.build()
 
-    # Parse main information like (amount of rooms, floor, area, region)
+    # Парсинг головної інформації (к-ть кімнат, поверх, площа, Район)
     def get_main_information(soup: BeautifulSoup) -> [str, str, str, str]:
         # constants to check the list "tags"
         need_words_ukrainian = [
@@ -62,15 +50,8 @@ class Parser:
         ]
 
         checklist = []
+        tags = soup.find("div", class_="css-41yf00").find_all("p")
 
-        # find all span tags in div 
-        div_with_tags = soup.find("div", class_="css-41yf00")
-        if div_with_tags and isinstance(div_with_tags, Tag):
-            tags = div_with_tags.find_all("span")
-        else:
-            tags = []
-         
-        # check for matches
         for need_word in need_words_russian:
             for tag in tags:
                 if need_word in tag.text:
@@ -80,8 +61,7 @@ class Parser:
             for tag in tags:
                 if need_word in tag.text:
                     checklist.append(tag.text)
-        
-        # TODO переробити принцип
+
         try:
             if len(checklist) != 4:
                 rooms = re.search(r"\d+", checklist[0]).group()
@@ -101,18 +81,19 @@ class Parser:
 
         # we are looking for a district and a city, because
         # if there is no district, then the city is a district
-        
 
-        # TODO можливо можна шукати одразу в find? 
         find = soup.find_all("script")
         pattern_district = re.compile(r'\\"districtName\\":\\"([^\\"]+)\\"')
         pattern_city = re.compile(r'\\"cityName\\":\\"([^\\"]+)\\"')
-        district, city = "", ""
 
         for one in find:
             district = pattern_district.search(one.text)
+            if district:
+                break
+
+        for one in find:
             city = pattern_city.search(one.text)
-            if district and city:
+            if city:
                 break
 
         if district:
@@ -124,52 +105,56 @@ class Parser:
 
         return rooms, flour, area, district
 
-    def get_price(self) -> str:
+    def get_price(soup: BeautifulSoup) -> [str, str]:
         # parsing price from the page
-        price = None
-        tags_can_be = ["h2", "h3", "h4", "h5", "h6"]
-        text_can_be = [re.compile(r".*грн.*"), re.compile(r".*\$.*")]
-        
-        ad_price_tag = self.soup.find("div", {"data-testid": "ad-price-container"})
-        print(ad_price_tag)
+        price = soup.find("h2", text=re.compile(r".*грн.*"))
 
-        for tag in tags_can_be:
-            for text in text_can_be:
-                price = self.soup.find(tag, text=text)
-                if price:
-                    break
+        if not price:
+            price = soup.find("h2", text=re.compile(r".*\$.*"))
+
+        if not price:
+            price = soup.find("h3", text=re.compile(r".*грн.*"))
+
+        if not price:
+            price = soup.find("h3", text=re.compile(r".*\$.*"))
+
+        if not price:
+            price = soup.find("h4", text=re.compile(r".*грн.*"))
+
+        if not price:
+            price = soup.find("h4", text=re.compile(r".*\$.*"))
 
         if not price:
             return "Суму не знайдено"
 
         return price.text
 
-    def delete_words(self, text: str, words_to_remove: list) -> str:
+    def delete_words(text: str, words_to_remove: list) -> str:
         # Використовуємо регулярний вираз для визначення слова з можливими крапками
         pattern = re.compile(
             r"\b(?:" + "|".join(map(re.escape, words_to_remove)) + r")\b", re.IGNORECASE
         )
+        print(text)
 
         # Замінюємо відповідні слова на порожні рядки
         result = pattern.sub("", text)
+        print(result)
 
         return result
 
-    def get_header(self) -> str:
+    def get_header(soup: BeautifulSoup) -> [str, str]:
         # parsing caption from the page
-        header = self.soup.find("h4", class_="css-yde3oc")
-        header_test = self.soup.find("div", {"data-testid": "ad_title"})
-        print(header_test)
+        header = soup.find("h4", class_="css-yde3oc")
+
         if not header:
             return "Заголовок не знайдено. Повідомте розробника про помилку."
 
         return header.text
 
-    def get_caption(self) -> str:
+    def get_caption(soup: BeautifulSoup) -> str:
         # parsing caption from the page
-        caption = self.soup.find("div", class_="css-1o924a9")
-        caption_test = self.soup.find("div", {"data-testid": "ad_description"})
-        print(caption_test)
+        caption = soup.find("div", class_="css-1o924a9")
+
         if not caption:
             return "Опис не знайдено. Повідомте розробника про помилку."
 
@@ -178,7 +163,7 @@ class Parser:
 
         return caption.text
 
-    def create_caption(self) -> str:
+    def create_caption(soup: BeautifulSoup) -> str:
         words = [
             "Від",
             "От",
@@ -229,11 +214,11 @@ class Parser:
             "комисии",
         ]
 
-        caption = self.delete_words(self.get_caption(), words)
-        header = self.delete_words(self.get_header(), words)
+        caption = Information.delete_words(Information.get_caption(soup), words)
+        header = Information.delete_words(Information.get_header(soup), words)
 
-        rooms, flour, area, district = self.get_main_information()
-        money = self.get_price()
+        rooms, flour, area, district = Information.get_main_information(soup)
+        money = Information.get_price(soup)
 
         captions = (
             f"🏡{rooms}к кв\n" f"🏢Поверх: {flour}\n" f"🔑Площа: {area}м2\n" f"📍Район: {district}\n"
@@ -247,9 +232,9 @@ class Parser:
 
 # Отримання всіх даних і запуск надсилання
 async def get_data(message: types.Message):
-    soup = Parser(message.text)
-    caption = soup.create_caption()
-    photo_group = soup.get_photo(caption)
+    soup: BeautifulSoup = get_url(message.text)
+    caption = Information.create_caption(soup)
+    photo_group = Information.get_photo(soup, caption)
     new_photo_group = photo_group.copy()
 
 
