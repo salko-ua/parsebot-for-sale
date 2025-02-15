@@ -1,12 +1,11 @@
 import re
-from ast import Await
-
 import requests
 from aiogram import types
 from aiogram.utils.media_group import MediaGroupBuilder
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 
+from main import bot
 
 
 class Parser:
@@ -279,8 +278,9 @@ async def get_data(message: types.Message):
     # check photo is alright
     for index in range(len(parser.images)):
         try:
-           message_photo = await message.bot.send_media_group(chat_id=-1001902595324, message_thread_id=805, media=[parser.images[index]])
-           await message.bot.delete_message(message_id=message_photo[0].message_id, chat_id=-1001902595324)
-        except Exception as e:
+           message_photo = await bot.send_media_group(chat_id=-1001902595324, message_thread_id=805, media=[parser.images[index]])
+           await bot.delete_message(message_id=message_photo[0].message_id, chat_id=-1001902595324)
+        except:
            parser.images.remove(parser.images[index])
-    await message.answer_media_group(media=new_photo_group)
+
+    await message.answer_media_group(media=parser.images, caption=parser.full_caption)
