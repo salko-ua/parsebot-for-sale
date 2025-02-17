@@ -4,6 +4,7 @@ from aiogram import types
 from aiogram.utils.media_group import MediaGroupBuilder
 from bs4 import BeautifulSoup
 from bs4.element import Tag
+from src.keyboards.parsing_edit import edit_parse_advert
 
 class Parser:
     def __init__(self, url):
@@ -282,5 +283,5 @@ async def get_data(message: types.Message):
         except:
            new_list.remove(parser.images[index])
     parser.images = new_list
-
-    await message.answer_media_group(media=parser.images, caption=parser.full_caption, parse_mode="html")
+    await message.answer_media_group(media=parser.images, caption=parser.full_caption, reply_markup=edit_parse_advert())
+    return parser

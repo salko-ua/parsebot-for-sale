@@ -1,6 +1,6 @@
 from aiogram import Bot, F, Router
 from aiogram.filters import Command
-from aiogram.filters.state import State, StatesGroup
+from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
