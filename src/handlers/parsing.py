@@ -153,7 +153,6 @@ async def repost_to_group(query: CallbackQuery, state: FSMContext):
         await state.clear()
         await query.message.delete()
     except Exception as e:
-        print(e)
-        await query.answer(f"Перевірте чи правильний id каналу/групи який ви приєднали та чи має бот права адміністратора {e}", show_alert=True)
+        await query.answer(f"Перевірте чи правильний id каналу/групи який ви приєднали та чи має бот права адміністратора {e} {group_id}", show_alert=True)
     
 
