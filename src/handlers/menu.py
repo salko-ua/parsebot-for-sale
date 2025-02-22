@@ -274,9 +274,8 @@ async def settings(message: Message):
 async def change_group(message: Message, state: FSMContext):
     db = await Database.setup()
     group_id = message.chat.id
-    print(group_id)
-
-    await db.update_group_id(telegram_id=message.from_user.id, group_id=message.text)
+    
+    await db.update_group_id(telegram_id=message.from_user.id, group_id=group_id)
     await state.clear()
     await message.answer("Групу додано ✅")
 
