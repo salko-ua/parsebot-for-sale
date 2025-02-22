@@ -273,7 +273,7 @@ async def settings(message: Message):
 @router.message(F.text == "Додати бота")
 async def change_group(message: Message, state: FSMContext):
     db = await Database.setup()
-    group_id = int(message.сhat.id)
+    group_id = message.chat.id
     print(group_id)
 
     await db.update_group_id(telegram_id=message.from_user.id, group_id=message.text)
