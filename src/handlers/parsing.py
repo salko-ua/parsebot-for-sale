@@ -1,17 +1,18 @@
 import traceback
 from datetime import datetime
 from aiogram import Bot, F, Router
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from src.control_db import Database
-from src.olx_api import get_data
+from src.olx_api import get_data, Parser
 from src.keyboards.parsing_edit import edit_parse_advert
 
 router = Router()
 
-class Parser(StatesGroup):
-    parser_obj = State()
+class ParserState(StatesGroup):
+    edit_caption = State()
+    buttons = State()
 
 @router.message(F.text.startswith("https://www.olx.ua"))
 @router.message(F.text.startswith("https://olx.ua"))
@@ -32,7 +33,7 @@ async def main(message: Message, bot: Bot, state: FSMContext):
         parser = await get_data(message)
         await db.update_count_parsing_post(telegram_id)
         await db.add_url(telegram_id, url=message.text, date=date)
-        await state.set_state(Parser.parser_obj)
+        await state.set_state(ParserState.buttons)
         await state.update_data(parser=parser, message=message)
     except Exception as e:
         text_for_admin = (
@@ -43,21 +44,77 @@ async def main(message: Message, bot: Bot, state: FSMContext):
         )
         await bot.send_message(chat_id=2138964363, text=text_for_admin)
         await message.answer(f"Здається пост уже не дійсний 🚫")
-        "Додати шаблон ➕"
-        "Репост в канал 🔁"
 
-@router.message(F.text == "Редагувати текст ✏️")
-async def edit_caption(message: Message):
-    await message.answer("Відправте новий опис для посту")
+
+@router.callback_query(F.data == "✏️ Редагувати", ParserState.buttons)
+async def edit_caption(query: CallbackQuery, state: FSMContext):
+    await query.answer("Відправте новий опис для посту", show_alert=True)
+    await query.message.delete()
+    await state.set_state(ParserState.edit_caption)
+
+@router.callback_query(F.data == "🔖 Допомога", ParserState.buttons)
+async def help(query: CallbackQuery):
+    alert = (
+        f"✏️ Редагувати-\n"
+        f"Редагує заголовок та опис в пост\n"
+        f"🔄 Cкинути-\n"
+        f"Повертає до початку\n"
+        f"➕Додати шаблон-\n"
+        f"Додає ваш шаблон в пост\n"
+        f"✅ Завершити або 🔁 Репост в канал\n"
+        f"Надсилає готовий пост\n"
+)
+    await query.answer(text=alert, show_alert=True)
     
-@router.message(F.text, Parser.parser_obj)
+@router.message(F.text, ParserState.edit_caption)
 async def edit_caption1(message: Message, state: FSMContext):
-    data = await state.get_data()
-    parser = data.get("parser")
-
-    parser.update_caption(update_to=message.text)
+    assert message.text is not None
+    data: dict = await state.get_data()
+    parser: Parser = data.get("parser")
     
-    await message.answer_media_group(media=parser.images, caption=parser.full_caption, reply_markup=edit_parse_advert())
+    parser.update_header(update_to=message.text)
+    parser.update_caption(update_to="")
+    
+    message = await message.answer_photo(photo=parser.images[0].media, caption=parser.full_caption, reply_markup=edit_parse_advert())
+    await state.set_state(ParserState.buttons)
+
+
+
+
+@router.callback_query(F.data == "🔄 Cкинути", ParserState.buttons)
+async def reset(query: CallbackQuery, state: FSMContext):
+    data: dict = await state.get_data()
+    parser: Parser = data.get("parser")
+    parser.reset_all()
+    
+    await query.message.delete()
+    await query.message.answer_photo(photo=parser.images[0].media, caption=parser.full_caption, reply_markup=edit_parse_advert())
+
+@router.callback_query(F.data == "✅ Завершити", ParserState.buttons)
+async def finish(query: CallbackQuery, state: FSMContext):
+    data: dict = await state.get_data()
+    parser: Parser = data.get("parser")
     await state.clear()
+
+    await query.message.delete()
+    await query.message.answer_media_group(media=parser.images)
+    await query.answer("Пост відредаговано ✅")
+
+@router.callback_query(F.data == "🔁 Репост в канал", ParserState.buttons)
+async def finish(query: CallbackQuery, state: FSMContext):
+    db = await Database.setup()
+    group_id = await db.get_group_id(telegram_id=query.from_user.id)
+
+    if group_id is None:
+        await query.answer("Ви не приєднали каналу")
+        return
+
+    data: dict = await state.get_data()
+    parser: Parser = data.get("parser")
+    await state.clear()
+    
+    await query.message.delete()
+    await query.message.bot.send_media_group(chat_id=group_id, media=parser.images)
+    await query.answer("Пост надіслано в канал ✅")
 
 

@@ -95,7 +95,7 @@ class Parser:
             self.caption = caption[0:800]
             return
 
-        self.caption = caption
+        self.caption = "📝Опис:\n" + caption
         self.update_full_caption()
 
     def reset_price(self) -> None:
@@ -254,7 +254,7 @@ class Parser:
         captions = (
             f"🏡{self.amount_of_rooms}к кв\n" f"🏢Поверх: {self.floor}\n" f"🔑Площа: {self.area}м2\n" f"📍Район: {self.district}\n"
         )
-        main_caption = f"💳️{self.price}" f"\n\n{self.header}\n\n" f"📝Опис:\n{self.caption}"
+        main_caption = f"💳️{self.price}" f"\n\n{self.header}\n\n" f"{self.caption}"
 
         self.full_caption = captions + main_caption
         self.reset_photo()
@@ -267,7 +267,7 @@ class Parser:
         self.update_full_caption()
 
 # Отримання всіх даних і запуск надсилання
-async def get_data(message: types.Message):
+async def get_data(message: types.Message) -> Parser:
     parser = Parser(url=message.text)
     parser.reset_all()
     print(parser.full_caption)
@@ -283,5 +283,6 @@ async def get_data(message: types.Message):
         except:
            new_list.remove(parser.images[index])
     parser.images = new_list
-    await message.answer_media_group(media=parser.images, caption=parser.full_caption, reply_markup=edit_parse_advert())
+
+    await message.answer_photo(photo=parser.images[0].media, caption=parser.full_caption, reply_markup=edit_parse_advert())
     return parser

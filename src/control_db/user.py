@@ -12,6 +12,17 @@ class UserDB(BaseDBPart):
             )
         ).fetchall()
         return bool(result[0][0])
+    
+    async def get_group_id(self, telegram_id):
+        result = await (
+            await self.cur.execute(
+                """SELECT group_id 
+                    FROM `user` 
+                    WHERE `telegram_id` = ?""",
+                (telegram_id,),
+            )
+        ).fetchall()
+        return result[0][0]
 
     async def get_username(self, telegram_id):
         result = await (
