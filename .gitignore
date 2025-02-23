@@ -1,8 +1,6 @@
 #
 database.db
 data/*
-poetry.lock
-pyproject.toml
 .direnv/
 
 # Byte-compiled / optimized / DLL files
