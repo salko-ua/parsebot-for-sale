@@ -139,6 +139,7 @@ async def repost_to_group(query: CallbackQuery, state: FSMContext):
     group_id = await db.get_group_id(telegram_id=query.from_user.id)
 
     if group_id == 0 or group_id is None:
+        print(group_id)
         await query.answer("Ви не приєднали каналу", show_alert=True)
         return
 
@@ -151,6 +152,7 @@ async def repost_to_group(query: CallbackQuery, state: FSMContext):
         await state.clear()
         await query.message.delete()
     except Exception as e:
+        print(e)
         await query.answer("Перевірте чи правильний id каналу/групи який ви приєднали та чи має бот права адміністратора", show_alert=True)
     
 
