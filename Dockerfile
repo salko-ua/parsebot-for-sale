@@ -10,7 +10,8 @@ RUN apt-get update && \
     curl -sSL https://install.python-poetry.org | python - && \
     poetry self add poetry-plugin-export
 COPY poetry.lock pyproject.toml ./
-RUN poetry export --no-interaction -o requirements.txt --without-hashes --only main,docker
+RUN poetry lock && poetry export --no-interaction -o requirements.txt --without-hashes --only main,docker
+
 
 
 FROM python:3.12-slim AS base
