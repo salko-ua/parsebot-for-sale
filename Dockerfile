@@ -1,7 +1,7 @@
 FROM python:3.12-slim AS poetry
 
-ENV PATH "/root/.local/bin:${PATH}"
-ENV PYTHONUNBUFFERED 1
+ENV PATH="/root/.local/bin:${PATH}"
+ENV PYTHONUNBUFFERED=1
 
 WORKDIR /root
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -15,7 +15,7 @@ RUN poetry export --no-interaction -o requirements.txt --without-hashes --only m
 
 FROM python:3.12-slim AS base
 
-ENV PYTHONPATH "/app"
+ENV PYTHONPATH="/app"
 
 WORKDIR /app
 
