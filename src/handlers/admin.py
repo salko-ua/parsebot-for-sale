@@ -34,6 +34,15 @@ async def send_file_db(message: Message):
     file_path = types.FSInputFile("data/database.db")
     await message.bot.send_document(message.from_user.id, file_path)
 
+@router.message(F.text == "db_migrate")
+async def migrate_db(message: Message):
+    if message.from_user.id not in ADMINS:
+        return
+    
+    db = await Database.setup()
+    result = await db.migrate1()
+    await message.answer(result)
+
 
 @router.message(Command("admin"))
 async def admin(message: Message):

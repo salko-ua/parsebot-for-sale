@@ -8,14 +8,14 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 
 
-def edit_parse_advert() -> ReplyKeyboardMarkup | InlineKeyboardMarkup:
+def edit_parse_advert(template: bool = False) -> ReplyKeyboardMarkup | InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     keyboard = [
         "🔖 Допомога",
         "🔄 Cкинути",
         "✏️ Редагувати",
-        "➕Додати шаблон",
+        "➕ Додати шаблон" if not template else "➖ Додати шаблон",
         "✅ Завершити",
         "🔁 Репост в канал"
     ]

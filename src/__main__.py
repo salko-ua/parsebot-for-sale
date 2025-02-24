@@ -1,5 +1,4 @@
 import asyncio
-import logging
 from aiogram import Dispatcher
 from src.middleware import CheckConnectioError, CheckPrivateChat
 from src.handlers import admin, menu, parsing, payments, task, telegram
@@ -28,6 +27,16 @@ async def start_bot():
     await dp.start_polling(bot)
 
 
+async def main():
+    try:
+        await start_bot()
+    except asyncio.CancelledError:
+        print("Bot stopped gracefully")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    asyncio.run(start_bot())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("Bot stopped by user")

@@ -19,6 +19,7 @@ class Parser:
         self.price = ""
         self.header = ""
         self.caption = ""
+        self.template = ""
         self.full_caption = ""
 
     def update_amount_of_rooms(self, update_to: str) -> None:
@@ -47,6 +48,10 @@ class Parser:
 
     def update_caption(self, update_to: str) -> None:
         self.caption = update_to
+        self.update_full_caption()
+
+    def update_template(self, update_to: str) -> None:
+        self.template = update_to
         self.update_full_caption()
 
     def delete_words(self, text: str, words_to_remove: list) -> str:
@@ -254,9 +259,9 @@ class Parser:
         captions = (
             f"🏡{self.amount_of_rooms}к кв\n" f"🏢Поверх: {self.floor}\n" f"🔑Площа: {self.area}м2\n" f"📍Район: {self.district}\n"
         )
-        main_caption = f"💳️{self.price}" f"\n\n{self.header}\n\n" f"{self.caption}"
-
-        self.full_caption = captions + main_caption
+        main_caption = f"💳️{self.price}" f"\n\n{self.header}" f"\n\n{self.caption}"
+        end = f"\n\n{self.template}" if self.template != "" else ""
+        self.full_caption = captions + main_caption + end 
         self.reset_photo()
 
     def reset_all(self) -> None:

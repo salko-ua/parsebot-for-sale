@@ -20,14 +20,17 @@ class Database(UserDB, UrlsDB, PremiumOperations, PremiumUser):
         if base:
             print("DATA BASE CONNECTED")
 
+
         await base.execute(
             """
             CREATE TABLE IF NOT EXISTS user(
-                telegram_id       INTEGER NOT NULL, 
+                telegram_id       INTEGER NOT NULL,
+                group_id          INTEGER DEFAULT 0,
                 first_name        TEXT,     -- ім`я
                 username          TEXT,     -- особливе ім`я
                 parsing_post      INTEHER DEFAULT 0,
-                date_join         TEXT     -- дата коли перший раз написав боту
+                date_join         TEXT,     -- дата коли перший раз написав бот
+                template          TEXT DEFAULT ''
             )
             """
         )

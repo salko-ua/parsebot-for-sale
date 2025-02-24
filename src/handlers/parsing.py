@@ -45,7 +45,34 @@ async def main(message: Message, bot: Bot, state: FSMContext):
         await bot.send_message(chat_id=2138964363, text=text_for_admin)
         await message.answer(f"Здається пост уже не дійсний 🚫")
 
+@router.callback_query(F.data == "➕ Додати шаблон", ParserState.buttons)
+async def add_template(query: CallbackQuery, state: FSMContext):
+    db = await Database.setup()
+    template = await db.get_template(telegram_id=query.from_user.id)
 
+    if template is None or template == "":
+        await query.answer("Ви ще не маєте шаблону додайте його в налаштуваннях")
+        return
+  
+    data: dict = await state.get_data()
+    parser: Parser = data.get("parser")
+
+    parser.update_template(update_to=template)
+    
+    await query.message.edit_caption(caption=parser.full_caption)
+    await query.message.edit_reply_markup(reply_markup=edit_parse_advert(template=True))
+
+@router.callback_query(F.data == "➖ Видалити шаблон", ParserState.buttons)
+async def delete_template(query: CallbackQuery, state: FSMContext):
+    data: dict = await state.get_data()
+    parser: Parser = data.get("parser")
+
+    parser.update_template(update_to="")
+    
+    await query.message.edit_caption(caption=parser.full_caption)
+    await query.message.edit_reply_markup(reply_markup=edit_parse_advert(template=False))
+
+    
 @router.callback_query(F.data == "✏️ Редагувати", ParserState.buttons)
 async def edit_caption(query: CallbackQuery, state: FSMContext):
     await query.answer("Відправте новий опис для посту", show_alert=True)
@@ -101,11 +128,11 @@ async def finish(query: CallbackQuery, state: FSMContext):
     await query.answer("Пост відредаговано ✅")
 
 @router.callback_query(F.data == "🔁 Репост в канал", ParserState.buttons)
-async def finish(query: CallbackQuery, state: FSMContext):
+async def repost_to_group(query: CallbackQuery, state: FSMContext):
     db = await Database.setup()
     group_id = await db.get_group_id(telegram_id=query.from_user.id)
 
-    if group_id is None:
+    if group_id == 0 or group_id is None:
         await query.answer("Ви не приєднали каналу")
         return
 
@@ -114,7 +141,10 @@ async def finish(query: CallbackQuery, state: FSMContext):
     await state.clear()
     
     await query.message.delete()
-    await query.message.bot.send_media_group(chat_id=group_id, media=parser.images)
-    await query.answer("Пост надіслано в канал ✅")
+    try:
+        await query.message.bot.send_media_group(chat_id=group_id, media=parser.images)
+        await query.answer("Пост надіслано в канал ✅")
+    except Exception as e:
+        await query.answer("Перевірте чи правильний id каналу/групи ви приєднали та чи має бот права адміністратора")
 
 
