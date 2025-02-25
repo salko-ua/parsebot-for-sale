@@ -1,9 +1,16 @@
 import asyncio
+import sentry_sdk
 from aiogram import Dispatcher
+
+from src.config import SENTRY_SDK
 from src.middleware import CheckConnectioError, CheckPrivateChat
 from src.handlers import admin, menu, parsing, payments, task, telegram
 
 from src.global_variable import bot, dp
+
+
+
+
 
 
 async def register_handlers(dp: Dispatcher):
@@ -36,6 +43,16 @@ async def main():
         print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
+    sentry_sdk.init(
+        dsn=SENTRY_SDK,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        traces_sample_rate=1.0,
+        # Set profiles_sample_rate to 1.0 to profile 100%
+        # of sampled transactions.
+        # We recommend adjusting this value in production.
+        profiles_sample_rate=1.0,
+    )
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
