@@ -29,6 +29,7 @@
           packages =
             with pkgs;
             [
+              (callPackage ./asyncache.nix {})  
               postgresql
               python3
               python3Packages.sqlalchemy

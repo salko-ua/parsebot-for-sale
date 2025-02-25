@@ -1,5 +1,6 @@
 import os
 
+import asyncache
 import aiosqlite
 
 from src.control_db.premium_operations import PremiumOperations
@@ -10,6 +11,7 @@ from src.control_db.user import UserDB
 
 class Database(UserDB, UrlsDB, PremiumOperations, PremiumUser):
     @classmethod
+    @asyncache.cached({})
     async def setup(cls):
         if not os.path.exists("./data"):
             os.mkdir("./data")
