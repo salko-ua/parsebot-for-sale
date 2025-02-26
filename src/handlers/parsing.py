@@ -111,8 +111,6 @@ async def edit_caption1(message: Message, state: FSMContext):
     await state.set_state(ParserState.buttons)
 
 
-
-
 @router.callback_query(F.data == "🔄 Cкинути", ParserState.buttons)
 async def reset(query: CallbackQuery, state: FSMContext):
     data: dict = await state.get_data()
@@ -139,7 +137,7 @@ async def repost_to_group(query: CallbackQuery, state: FSMContext):
     group_id = await db.get_group_id(telegram_id=query.from_user.id)
 
     if group_id == 0 or group_id is None:
-        await query.answer("Ви не приєднали каналу", show_alert=True)
+        await query.answer("Ви не приєднали бота до каналу", show_alert=True)
         return
     
     print(group_id)
@@ -148,11 +146,12 @@ async def repost_to_group(query: CallbackQuery, state: FSMContext):
     parser: Parser = data.get("parser")
     
     try:
+        await query.message.delete()
+        await query.message.answer_media_group(media=parser.images)
         await query.message.bot.send_media_group(chat_id=group_id, media=parser.images)
         await query.answer("Пост надіслано в канал ✅", show_alert=True)
         await state.clear()
-        await query.message.delete()
     except Exception as e:
-        await query.answer(f"Перевірте чи правильний id каналу/групи який ви приєднали та чи має бот права адміністратора {e} {group_id}", show_alert=True)
+        await query.answer(f"Не можу знайти Групу/Канал в яку надсилати оголошення", show_alert=True)
     
 
