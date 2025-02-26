@@ -284,9 +284,9 @@ async def change_group(message: Message):
     await message.delete()
 
 
-@router.callback_query(F.data == "Змінити шаблон")
-async def change_group(query: CallbackQuery, state: FSMContext):
-    await query.answer("Надішліть шаблон текстом", show_alert=True)
+@router.message(F.text == "Додати/Змінити шаблон 📝")
+async def change_group(message: Message, state: FSMContext):
+    await message.answer("Надішліть шаблон текстом")
 
     await state.set_state(SendFAQ.change_template)
 
