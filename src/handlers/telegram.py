@@ -68,7 +68,7 @@ async def start(message: Message):
     media_group.add_photo(
         type="photo",
         media=r"https://img.freepik.com/premium-photo/on-a-black-surface-bright-multicolored-stickers-with-the-word"
-              r"-test_380694-1057.jpg?w=1800",
+        r"-test_380694-1057.jpg?w=1800",
     )
     await message.answer_media_group(media=media_group.build())
 
@@ -102,5 +102,3 @@ async def all_message(message: Message):
         return
 
     await message.answer("🔴 Це повідомлення не для групи, видаліть його 🚫")
-
-

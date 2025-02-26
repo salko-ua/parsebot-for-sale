@@ -12,7 +12,7 @@ class UserDB(BaseDBPart):
             )
         ).fetchall()
         return bool(result[0][0])
-    
+
     async def get_group_id(self, telegram_id):
         result = await (
             await self.cur.execute(
@@ -26,11 +26,12 @@ class UserDB(BaseDBPart):
 
     async def update_group_id(self, telegram_id, group_id):
         await self.cur.execute(
-            "UPDATE user SET group_id = ? WHERE telegram_id = ?", (group_id, telegram_id),
+            "UPDATE user SET group_id = ? WHERE telegram_id = ?",
+            (group_id, telegram_id),
         )
         await self.base.commit()
 
-    async def get_template(self, telegram_id): 
+    async def get_template(self, telegram_id):
         result = await (
             await self.cur.execute(
                 """SELECT template
@@ -43,10 +44,10 @@ class UserDB(BaseDBPart):
 
     async def update_template(self, telegram_id, template):
         await self.cur.execute(
-                "UPDATE user SET template = ? WHERE telegram_id = ?", (template, telegram_id),
+            "UPDATE user SET template = ? WHERE telegram_id = ?",
+            (template, telegram_id),
         )
         await self.base.commit()
-
 
     async def get_username(self, telegram_id):
         result = await (
@@ -102,7 +103,6 @@ class UserDB(BaseDBPart):
             )
         ).fetchall()
 
-
     async def migrate1(self) -> str:
         text = ""
         result = await self.cur.execute("PRAGMA table_info(user);")
@@ -110,18 +110,21 @@ class UserDB(BaseDBPart):
 
         column_names = [column[1] for column in columns]
         print(column_names)
-        if 'group_id' not in column_names:
-            await self.cur.execute("ALTER TABLE user ADD COLUMN group_id INTEGER DEFAULT 0")
+        if "group_id" not in column_names:
+            await self.cur.execute(
+                "ALTER TABLE user ADD COLUMN group_id INTEGER DEFAULT 0"
+            )
             text += "'group_id' added."
         else:
             text += "'group_id' already exists."
-        
-        if 'template' not in column_names:
-            await self.cur.execute("ALTER TABLE user ADD COLUMN template TEXT DEFAULT ''")
+
+        if "template" not in column_names:
+            await self.cur.execute(
+                "ALTER TABLE user ADD COLUMN template TEXT DEFAULT ''"
+            )
             text += "'template' added."
         else:
             text += "'template' already exists."
-
 
         await self.base.commit()
         return text

@@ -10,7 +10,6 @@ from src.keyboards.premium import buy_premium_kb
 from src.global_variable import bot, scheduler
 
 
-
 async def check_all_invoice(lock):
     async with lock:
         db = await Database.setup()
@@ -48,12 +47,14 @@ async def check_all_premium(lock):
             if expiration_date_in_3_days == current_date:
                 text_admin = f"Підписка {telegram_id} залишилось 3 дні 🟨"
                 text_user = (
-                    f"Термін дії вашої підписки закінчиться через 3 дні\n" f"Бажаєте продовжити її?"
+                    f"Термін дії вашої підписки закінчиться через 3 дні\n"
+                    f"Бажаєте продовжити її?"
                 )
             elif expiration_date == current_date:
                 text_admin = f"Підписка {telegram_id} останній день 🟧"
                 text_user = (
-                    f"Термін дії вашої підписки закінчиться завтра\n" "Бажаєте продовжити її?"
+                    f"Термін дії вашої підписки закінчиться завтра\n"
+                    "Бажаєте продовжити її?"
                 )
             elif expiration_date <= current_date:
                 text_admin = f"Підписка {telegram_id} закінчилась 🟥"
@@ -71,14 +72,18 @@ async def check_all_premium(lock):
                 )
 
 
-async def notify_status_premium(text_user: str, text_admin: str, telegram_id: int) -> None:
+async def notify_status_premium(
+    text_user: str, text_admin: str, telegram_id: int
+) -> None:
     try:
-        await bot.send_message(text=text_admin, chat_id=-1001902595324, message_thread_id=481)
+        await bot.send_message(
+            text=text_admin, chat_id=-1001902595324, message_thread_id=481
+        )
         await bot.send_message(
             text=text_user, chat_id=telegram_id, reply_markup=buy_premium_kb(True)
         )
     except Exception as e:
-        print(f'NOTIFY BLOCK ERROR: {e}')
+        print(f"NOTIFY BLOCK ERROR: {e}")
 
 
 async def create_tasks():
@@ -88,4 +93,6 @@ async def create_tasks():
     scheduler.add_job(
         check_all_invoice, "interval", seconds=10, id="check_all_invoice", args=(lock,)
     )
-    scheduler.add_job(check_all_premium, "cron", hour=7, id="check_all_premium", args=(lock,))
+    scheduler.add_job(
+        check_all_premium, "cron", hour=7, id="check_all_premium", args=(lock,)
+    )

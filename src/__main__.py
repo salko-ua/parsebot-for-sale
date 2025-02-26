@@ -9,10 +9,6 @@ from src.handlers import admin, menu, parsing, payments, task, telegram
 from src.global_variable import bot, dp
 
 
-
-
-
-
 async def register_handlers(dp: Dispatcher):
     dp.message.outer_middleware(CheckConnectioError())
     dp.callback_query.outer_middleware(CheckConnectioError())
@@ -24,7 +20,6 @@ async def register_handlers(dp: Dispatcher):
 
 
 async def start_bot():
-
     await register_handlers(dp)
     await task.create_tasks()
     await bot.delete_webhook(drop_pending_updates=True)
@@ -39,6 +34,7 @@ async def main():
         print("Bot stopped gracefully")
     except Exception as e:
         print(f"An error occurred: {e}")
+
 
 if __name__ == "__main__":
     sentry_sdk.init(

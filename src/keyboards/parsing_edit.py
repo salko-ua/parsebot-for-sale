@@ -1,4 +1,3 @@
-
 from aiogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
@@ -7,8 +6,9 @@ from aiogram.types import (
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 
-
-def edit_parse_advert(template: bool = False) -> ReplyKeyboardMarkup | InlineKeyboardMarkup:
+def edit_parse_advert(
+    template: bool = False,
+) -> ReplyKeyboardMarkup | InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     keyboard = [
@@ -17,14 +17,10 @@ def edit_parse_advert(template: bool = False) -> ReplyKeyboardMarkup | InlineKey
         "✏️ Редагувати",
         "➕ Додати шаблон" if not template else "➖ Видалити шаблон",
         "✅ Отримати пост",
-        "🔁 Репост в канал"
+        "🔁 Репост в канал",
     ]
 
     for button in keyboard:
         builder.add(InlineKeyboardButton(text=button, callback_data=button))
 
     return builder.adjust(2).as_markup(resize_keyboard=True)
-
-
-
-

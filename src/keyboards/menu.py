@@ -10,7 +10,13 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 def menu_kb() -> ReplyKeyboardMarkup | InlineKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
 
-    keyboard = ["Інформація 🧾", "Підписка 👑", "Посилання 🔗", "Зворт зв`язок 👤", "Налаштування ⚙️"]
+    keyboard = [
+        "Інформація 🧾",
+        "Підписка 👑",
+        "Посилання 🔗",
+        "Зворт зв`язок 👤",
+        "Налаштування ⚙️",
+    ]
 
     for button in keyboard:
         builder.add(KeyboardButton(text=button, callback_data=button))

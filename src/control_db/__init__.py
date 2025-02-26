@@ -22,7 +22,6 @@ class Database(UserDB, UrlsDB, PremiumOperations, PremiumUser):
         if base:
             print("DATA BASE CONNECTED")
 
-
         await base.execute(
             """
             CREATE TABLE IF NOT EXISTS user(

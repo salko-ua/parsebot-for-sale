@@ -26,19 +26,18 @@ class SendNews(StatesGroup):
 
 @router.message(F.text == "db")
 async def send_file_db(message: Message):
-    assert message.from_user is not None;
-    assert message.bot is not None
     if not (message.from_user.id in ADMINS):
         return
 
     file_path = types.FSInputFile("data/database.db")
     await message.bot.send_document(message.from_user.id, file_path)
 
+
 @router.message(F.text == "db_migrate")
 async def migrate_db(message: Message):
     if message.from_user.id not in ADMINS:
         return
-    
+
     db = await Database.setup()
     result = await db.migrate1()
     await message.answer(result)
@@ -46,8 +45,6 @@ async def migrate_db(message: Message):
 
 @router.message(Command("admin"))
 async def admin(message: Message):
-    assert message.from_user is not None
-
     if message.from_user.id in ADMINS:
         await message.delete()
         await message.answer("Ось ваша клавіатура ⬇️", reply_markup=admin_kb())
@@ -55,9 +52,6 @@ async def admin(message: Message):
 
 @router.message(F.text.startswith("add"))
 async def add_fucking_stupid_people(message: Message):
-    assert message.from_user is not None
-    assert message.text is not None
-    assert message.bot is not None
     if message.from_user.id not in ADMINS:
         return
 
@@ -106,7 +100,6 @@ async def add_fucking_stupid_people(message: Message):
 
 @router.message(F.text == "Всі Користувачі 👥")
 async def all_people_from_db(message: Message):
-    assert message.from_user is not None
     if message.from_user.id not in ADMINS:
         return
     await message.delete()
@@ -129,7 +122,6 @@ async def all_people_from_db(message: Message):
 
 @router.message(F.text == "Всі Користувачі 👑")
 async def all_premium_from_db(message: Message):
-    assert message.from_user is not None
     if message.from_user.id not in ADMINS:
         return
     await message.delete()
@@ -138,11 +130,11 @@ async def all_premium_from_db(message: Message):
     all_premium = await db.get_all_premium()
     text = "Всі користувачі 👑"
     for (
-            telegram_id,
-            is_premium,
-            expiration_date,
-            bought_premium,
-            date_purchase,
+        telegram_id,
+        is_premium,
+        expiration_date,
+        bought_premium,
+        date_purchase,
     ) in all_premium:
         text += f"\nID: {telegram_id}"
         text += f"\nПреміум: {'активний' if is_premium else 'не активний'}"
@@ -150,13 +142,14 @@ async def all_premium_from_db(message: Message):
         text += f"\nКупив\\Продовжив: {date_purchase}"
         text += f"\nДіє до: {expiration_date}\n\n"
 
-    file = types.BufferedInputFile(file=text.encode(), filename=f"Користувачі що купували.txt")
+    file = types.BufferedInputFile(
+        file=text.encode(), filename=f"Користувачі що купували.txt"
+    )
     await message.answer_document(file)
 
 
 @router.message(F.text == "Користувачі що не мали 👑")
 async def people_ex(message: Message):
-    assert message.from_user is not None
     if message.from_user.id not in ADMINS:
         return
     await message.delete()
@@ -173,13 +166,14 @@ async def people_ex(message: Message):
             formatted_date = date_join.strftime("%Y-%m-%d %H:%M")
             new += f"\nІм`я: @{username}\nID: {telegram_id}\nВикористав тест: {'так' if parsing_post > 0 else 'ні'}\nПриєднався: {formatted_date}\n"
 
-    file = types.BufferedInputFile(file=new.encode(), filename=f"Не купували преміум.txt")
+    file = types.BufferedInputFile(
+        file=new.encode(), filename=f"Не купували преміум.txt"
+    )
     await message.answer_document(file)
 
 
 @router.message(F.text == "Статистика 📊")
 async def stats(message: Message):
-    assert message.from_user is not None
     await message.delete()
     if message.from_user.id not in ADMINS:
         return
@@ -189,10 +183,6 @@ async def stats(message: Message):
     operation_1day = await db.get_stats_from_operation(1)
     operation_7days = await db.get_stats_from_operation(7)
     operation_30days = await db.get_stats_from_operation(30)
-    assert operations is not None
-    assert operation_1day is not None
-    assert operation_7days is not None
-    assert operation_30days is not None
 
     stats_all_time = {"count": operations[0], "sum": operations[1]}
     stats_1day = {"count": operation_1day[0], "sum": operation_1day[1]}
@@ -226,7 +216,6 @@ async def stats(message: Message):
 
 @router.message(F.text == "Розсилка 📢")
 async def alarm(message: Message):
-    assert message.from_user is not None
     if message.from_user.id not in ADMINS:
         return
 
@@ -258,8 +247,6 @@ async def send_message_single(message: Message, state: FSMContext):
 
 @router.message(SendNews.send_message_finish, F.text)
 async def send_news_users(message: Message, state: FSMContext):
-    assert message.bot is not None
-    assert message.text is not None
     data = await state.get_data()
     message_text = data["message"]
     await state.clear()
@@ -312,9 +299,6 @@ async def send_mixed_news2(message: Message, state: FSMContext):
 
 
 def send_notification(message: Message):
-    assert message.bot is not None
-    assert message.text is not None
-    assert message is not None
     async def wrapped(user_id: int):
         try:
             await message.bot.send_message(user_id, text=message.text)

@@ -1,4 +1,3 @@
-
 import sentry_sdk
 from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler

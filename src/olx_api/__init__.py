@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from bs4.element import Tag
 from src.keyboards.parsing_edit import edit_parse_advert
 
+
 class Parser:
     def __init__(self, url):
         self.url = url
@@ -41,7 +42,7 @@ class Parser:
     def update_price(self, update_to: str) -> None:
         self.price = update_to
         self.update_full_caption()
-    
+
     def update_header(self, update_to: str) -> None:
         self.header = update_to
         self.update_full_caption()
@@ -69,7 +70,7 @@ class Parser:
         # parsing caption from the page
         header_parent = self.soup.find("div", {"data-testid": "ad_title"})
         if header_parent and isinstance(header_parent, Tag):
-            header = header_parent.find(lambda tag: tag.name not in ['style', 'script'])
+            header = header_parent.find(lambda tag: tag.name not in ["style", "script"])
             header = header.text if header else None
         else:
             header = None
@@ -84,14 +85,14 @@ class Parser:
     def reset_caption(self) -> None:
         # parsing caption parent
         full_caption = self.soup.find("div", {"data-testid": "ad_description"})
-        
+
         # get caption if he is exist
         if full_caption and isinstance(full_caption, Tag):
             caption = full_caption.find("div")
             caption = caption.text if caption else None
         else:
             caption = None
-            
+
         if caption is None:
             self.caption = "Опис не знайдено."
             return
@@ -105,10 +106,10 @@ class Parser:
 
     def reset_price(self) -> None:
         # parsing price from the page
-          
+
         price_parent = self.soup.find("div", {"data-testid": "ad-price-container"})
         if price_parent and isinstance(price_parent, Tag):
-            price = price_parent.find(lambda tag: tag.name not in ['style', 'script'])
+            price = price_parent.find(lambda tag: tag.name not in ["style", "script"])
             price = price.text if price else None
         else:
             price = None
@@ -138,13 +139,13 @@ class Parser:
 
         checklist = []
 
-        # find all span tags in div 
+        # find all span tags in div
         div_with_tags = self.soup.find("div", class_="css-41yf00")
         if div_with_tags and isinstance(div_with_tags, Tag):
             tags = div_with_tags.find_all("p")
         else:
             tags = []
-         
+
         # check for matches
         for need_word in need_words_russian:
             for tag in tags:
@@ -155,12 +156,11 @@ class Parser:
             for tag in tags:
                 if need_word in tag.text:
                     checklist.append(tag.text)
-        
-        
-        # TODO переробити принцип 
+
+        # TODO переробити принцип
         try:
             if len(checklist) != 4:
-                rooms = re.search(r"\d+", checklist[0]).group() 
+                rooms = re.search(r"\d+", checklist[0]).group()
                 area = re.search(r"\d+", checklist[1]).group()
                 find_everything = re.search(r"\d+", checklist[2])
                 floor = f"{find_everything.group()}"
@@ -177,9 +177,8 @@ class Parser:
 
         # we are looking for a district and a city, because
         # if there is no district, then the city is a district
-        
 
-        # TODO можливо можна шукати одразу в find? 
+        # TODO можливо можна шукати одразу в find?
         find = self.soup.find_all("script")
         pattern_district = re.compile(r'\\"districtName\\":\\"([^\\"]+)\\"')
         pattern_city = re.compile(r'\\"cityName\\":\\"([^\\"]+)\\"')
@@ -212,58 +211,88 @@ class Parser:
             images = wrapper.find_all("img")
         else:
             images = []
-        
+
         # list with photo urls
         list_src_photo = []
         media_group = MediaGroupBuilder(caption=self.full_caption)
-        
+
         # add urls to list
         for src in images:
             list_src_photo.append(src.get("src"))
-        
+
         # if images more then 10 cut to 10
         if len(list_src_photo) > 10:
             del list_src_photo[10:]
-        
+
         # add images_url to media_group
         for photo_url in list_src_photo:
             media_group.add_photo(media=photo_url)
-        
+
         # save images
-        self.images = media_group.build() 
+        self.images = media_group.build()
 
     def update_full_caption(self) -> None:
         words = [
-            "Від", "От",
-            "я собственник", "я власнник",
-            "посредников", "своя", "свою",
-            "риелтор", "риелторов",
-            "агентство", "агент",
-            "маклер", "посредник", "личную",
-            "хозяин", "собственник", "собственника",
-            "хозяина", "хозяйка", "без комиссии",
-            "агента", "агентства", "собственников",
-            "посередників", "ріелтор", "ріелторів",
-            "агентство", "маклер", "посередник",
-            "посередник", "особисту", "власник",
-            "власника", "власників",
-            "хазяїн", "хазяйка", "особисту",
-            "без комісії", "без рієлторів",
-            "комісій", "Без риелторов",
-            "комисий", "комісіЇ", "комисии",
+            "Від",
+            "От",
+            "я собственник",
+            "я власнник",
+            "посредников",
+            "своя",
+            "свою",
+            "риелтор",
+            "риелторов",
+            "агентство",
+            "агент",
+            "маклер",
+            "посредник",
+            "личную",
+            "хозяин",
+            "собственник",
+            "собственника",
+            "хозяина",
+            "хозяйка",
+            "без комиссии",
+            "агента",
+            "агентства",
+            "собственников",
+            "посередників",
+            "ріелтор",
+            "ріелторів",
+            "агентство",
+            "маклер",
+            "посередник",
+            "посередник",
+            "особисту",
+            "власник",
+            "власника",
+            "власників",
+            "хазяїн",
+            "хазяйка",
+            "особисту",
+            "без комісії",
+            "без рієлторів",
+            "комісій",
+            "Без риелторов",
+            "комисий",
+            "комісіЇ",
+            "комисии",
         ]
 
         self.caption = self.delete_words(self.caption, words)
         self.header = self.delete_words(self.header, words)
 
         captions = (
-            f"🏡{self.amount_of_rooms}к кв\n" f"🏢Поверх: {self.floor}\n" f"🔑Площа: {self.area}м2\n" f"📍Район: {self.district}\n"
+            f"🏡{self.amount_of_rooms}к кв\n"
+            f"🏢Поверх: {self.floor}\n"
+            f"🔑Площа: {self.area}м2\n"
+            f"📍Район: {self.district}\n"
         )
         header = f"\n\n{self.header}" if self.header != "" else ""
         caption = f"\n\n{self.caption}" if self.caption != "" else ""
         main_caption = f"💳️{self.price}" f"{header}" f"{caption}"
         end = f"\n\n{self.template}" if self.template != "" else ""
-        self.full_caption = captions + main_caption + end 
+        self.full_caption = captions + main_caption + end
         self.reset_photo()
 
     def reset_all(self) -> None:
@@ -273,23 +302,33 @@ class Parser:
         self.reset_main_information()
         self.update_full_caption()
 
+
 # Отримання всіх даних і запуск надсилання
 async def get_data(message: types.Message) -> Parser:
     parser = Parser(url=message.text)
     parser.reset_all()
     print(parser.full_caption)
 
-
     # check photo is alright
     new_list = parser.images.copy()
-    assert message.bot is not None
+
     for index in range(len(parser.images)):
         try:
-           message_photo = await message.bot.send_media_group(chat_id=-1001902595324, message_thread_id=805, media=[parser.images[index]])
-           await message.bot.delete_message(message_id=message_photo[0].message_id, chat_id=-1001902595324)
+            message_photo = await message.bot.send_media_group(
+                chat_id=-1001902595324,
+                message_thread_id=805,
+                media=[parser.images[index]],
+            )
+            await message.bot.delete_message(
+                message_id=message_photo[0].message_id, chat_id=-1001902595324
+            )
         except:
-           new_list.remove(parser.images[index])
+            new_list.remove(parser.images[index])
     parser.images = new_list
 
-    await message.answer_photo(photo=parser.images[0].media, caption=parser.full_caption, reply_markup=edit_parse_advert())
+    await message.answer_photo(
+        photo=parser.images[0].media,
+        caption=parser.full_caption,
+        reply_markup=edit_parse_advert(),
+    )
     return parser

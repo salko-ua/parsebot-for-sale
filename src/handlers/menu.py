@@ -6,10 +6,11 @@ from aiogram.types import CallbackQuery, Message, message
 
 from src.control_db import Database
 from src.keyboards.menu import about, buy_premium, continue_premium, hide_kb
-from src.keyboards.setting import send_settings 
+from src.keyboards.setting import send_settings
 from src.keyboards.premium import back
 
 router = Router()
+
 
 class SendFAQ(StatesGroup):
     send_message = State()
@@ -262,12 +263,14 @@ async def faq_back(message: Message, state: FSMContext, bot: Bot):
     await messages.delete()
     await message.answer("Повідомлення успішно надіслано ✅\nОчікуйте на відповідь 🕐")
 
+
 @router.message(F.text == "Налаштування ⚙️")
 async def settings(message: Message):
     db = await Database.setup()
 
     await message.delete()
     await message.answer("Що вас цікавить ?", reply_markup=send_settings())
+
 
 @router.message(Command("add"))
 @router.message(F.text == "Додати бота")
@@ -286,6 +289,7 @@ async def change_group(query: CallbackQuery, state: FSMContext):
     await query.answer("Надішліть шаблон текстом", show_alert=True)
 
     await state.set_state(SendFAQ.change_template)
+
 
 @router.message(F.text, SendFAQ.change_template)
 async def change_group_id(message: Message, state: FSMContext):

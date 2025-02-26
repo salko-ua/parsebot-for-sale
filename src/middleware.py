@@ -16,4 +16,3 @@ class CheckConnectioError(BaseMiddleware):
             return await handler(event, data)
         except aiohttp.ClientConnectionError as e:
             print(f"Error: {e}")
-

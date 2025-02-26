@@ -73,7 +73,9 @@ def create_hash(to_encode: list[str | int | None]) -> str:
     to_hash = ""
     for element in to_encode:
         to_hash += (str(element) if element is not None else "") + ";"
-    return hmac.new(SECRET_KEY.encode("utf-8"), to_hash[:-1].encode("utf-8"), "MD5").hexdigest()
+    return hmac.new(
+        SECRET_KEY.encode("utf-8"), to_hash[:-1].encode("utf-8"), "MD5"
+    ).hexdigest()
 
 
 def generate_random_string(length: int) -> str:
@@ -162,7 +164,6 @@ async def get_payment_info(order_reference: str, merchant_account: str) -> Check
 @router.callback_query(F.data == "Продовжити підписку 💳")
 @router.callback_query(F.data == "Придбати підписку 💳")
 async def payment(query: CallbackQuery, message=None):
-    assert message is not None
     db = await Database.setup()
     amount = 300
     currency = "UAH"
@@ -296,4 +297,6 @@ async def cancel_invoice(query: CallbackQuery):
     merchant_account = "t_me_48799"
     order_reference = query.data[-12:]
     await query.message.delete()
-    await remove_invoice(merchant_account=merchant_account, order_reference=order_reference)
+    await remove_invoice(
+        merchant_account=merchant_account, order_reference=order_reference
+    )
