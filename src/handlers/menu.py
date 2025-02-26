@@ -6,7 +6,6 @@ from aiogram.types import CallbackQuery, Message, message
 
 from src.control_db import Database
 from src.keyboards.menu import about, buy_premium, continue_premium, hide_kb
-from src.keyboards.setting import send_settings
 from src.keyboards.premium import back
 
 router = Router()
@@ -263,13 +262,6 @@ async def faq_back(message: Message, state: FSMContext, bot: Bot):
     await messages.delete()
     await message.answer("Повідомлення успішно надіслано ✅\nОчікуйте на відповідь 🕐")
 
-
-@router.message(F.text == "Налаштування ⚙️")
-async def settings(message: Message):
-    db = await Database.setup()
-
-    await message.delete()
-    await message.answer("Що вас цікавить ?", reply_markup=send_settings())
 
 
 @router.message(Command("add"))
