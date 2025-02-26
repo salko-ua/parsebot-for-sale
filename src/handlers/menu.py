@@ -269,22 +269,12 @@ async def settings(message: Message):
     await message.delete()
     await message.answer("Що вас цікавить ?", reply_markup=send_settings())
 
-@router.callback_query(F.data == "Змінити групу")
-async def change_group(query: CallbackQuery, state: FSMContext):
-    await query.answer("Введіть ID групи, в яку ви хочете надсилати пости", show_alert=True)
-
-    await state.set_state(SendFAQ.change_group)
-
-@router.message(F.text, SendFAQ.change_group)
-async def change_group_id(message: Message, state: FSMContext):
+@router.message(Command("add"))
+@router.message(F.text == "Додати бота")
+async def change_group(message: Message, state: FSMContext):
     db = await Database.setup()
-    
-    try:
-        group_id = int(message.text)
-    except:
-        await message.answer("ID групи повинно бути числом")
-        await state.clear()
-        return 
+    group_id = int(message.сhat.id)
+    print(group_id)
 
     await db.update_group_id(telegram_id=message.from_user.id, group_id=message.text)
     await state.clear()

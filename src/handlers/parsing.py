@@ -122,7 +122,7 @@ async def reset(query: CallbackQuery, state: FSMContext):
     await query.message.delete()
     await query.message.answer_photo(photo=parser.images[0].media, caption=parser.full_caption, reply_markup=edit_parse_advert())
 
-@router.callback_query(F.data == "✅ Завершити", ParserState.buttons)
+@router.callback_query(F.data == "✅ Отримати пост", ParserState.buttons)
 async def finish(query: CallbackQuery, state: FSMContext):
     data: dict = await state.get_data()
     parser: Parser = data.get("parser")
