@@ -10,7 +10,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 def send_settings() -> ReplyKeyboardMarkup | InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
-    keyboard = ["Змінити групу", "Змінити шаблон"]
+    keyboard = ["Змінити шаблон"]
 
     for button in keyboard:
         builder.add(InlineKeyboardButton(text=button, callback_data=button))
