@@ -2,16 +2,19 @@ from aiogram import Bot, F, Router
 from aiogram.filters import Command
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, message
 
 from src.control_db import Database
 from src.keyboards.menu import about, buy_premium, continue_premium, hide_kb
+from src.keyboards.setting import send_settings 
 from src.keyboards.premium import back
 
 router = Router()
 
 class SendFAQ(StatesGroup):
     send_message = State()
+    change_group = State()
+    change_template = State()
 
 
 @router.message(Command("about"))
@@ -258,3 +261,47 @@ async def faq_back(message: Message, state: FSMContext, bot: Bot):
 
     await messages.delete()
     await message.answer("Повідомлення успішно надіслано ✅\nОчікуйте на відповідь 🕐")
+
+@router.message(F.text == "Налаштування ⚙️")
+async def settings(message: Message):
+    db = await Database.setup()
+
+    await message.delete()
+    await message.answer("Що вас цікавить ?", reply_markup=send_settings())
+
+@router.callback_query(F.data == "Змінити групу")
+async def change_group(query: CallbackQuery, state: FSMContext):
+    await query.answer("Введіть ID групи, в яку ви хочете надсилати пости", show_alert=True)
+
+    await state.set_state(SendFAQ.change_group)
+
+@router.message(F.text, SendFAQ.change_group)
+async def change_group_id(message: Message, state: FSMContext):
+    db = await Database.setup()
+    
+    try:
+        group_id = int(message.text)
+    except:
+        await message.answer("ID групи повинно бути числом")
+        await state.clear()
+        return 
+
+    await db.update_group_id(telegram_id=message.from_user.id, group_id=message.text)
+    await state.clear()
+    await message.answer("Групу додано ✅")
+
+
+
+@router.callback_query(F.data == "Змінити шаблон")
+async def change_group(query: CallbackQuery, state: FSMContext):
+    await query.answer("Надішліть шаблон текстом", show_alert=True)
+
+    await state.set_state(SendFAQ.change_template)
+
+@router.message(F.text, SendFAQ.change_template)
+async def change_group_id(message: Message, state: FSMContext):
+    db = await Database.setup()
+
+    await db.update_template(telegram_id=message.from_user.id, template=message.text)
+    await state.clear()
+    await message.answer("Шаблон додано ✅")

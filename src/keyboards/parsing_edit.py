@@ -15,7 +15,7 @@ def edit_parse_advert(template: bool = False) -> ReplyKeyboardMarkup | InlineKey
         "🔖 Допомога",
         "🔄 Cкинути",
         "✏️ Редагувати",
-        "➕ Додати шаблон" if not template else "➖ Додати шаблон",
+        "➕ Додати шаблон" if not template else "➖ Видалити шаблон",
         "✅ Завершити",
         "🔁 Репост в канал"
     ]

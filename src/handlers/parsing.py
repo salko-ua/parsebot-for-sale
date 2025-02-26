@@ -51,7 +51,7 @@ async def add_template(query: CallbackQuery, state: FSMContext):
     template = await db.get_template(telegram_id=query.from_user.id)
 
     if template is None or template == "":
-        await query.answer("Ви ще не маєте шаблону додайте його в налаштуваннях")
+        await query.answer("Ви ще не маєте шаблону додайте його в налаштуваннях", show_alert=True)
         return
   
     data: dict = await state.get_data()
@@ -75,8 +75,13 @@ async def delete_template(query: CallbackQuery, state: FSMContext):
     
 @router.callback_query(F.data == "✏️ Редагувати", ParserState.buttons)
 async def edit_caption(query: CallbackQuery, state: FSMContext):
-    await query.answer("Відправте новий опис для посту", show_alert=True)
+    data: dict = await state.get_data()
+    parser: Parser = data.get("parser")
+
+    
+    await query.answer("Тепер надішліть відредаговний текст", show_alert=True)
     await query.message.delete()
+    await query.message.answer(parser.header + "\n\n" + parser.caption)
     await state.set_state(ParserState.edit_caption)
 
 @router.callback_query(F.data == "🔖 Допомога", ParserState.buttons)
@@ -123,9 +128,10 @@ async def finish(query: CallbackQuery, state: FSMContext):
     parser: Parser = data.get("parser")
     await state.clear()
 
-    await query.message.delete()
     await query.message.answer_media_group(media=parser.images)
-    await query.answer("Пост відредаговано ✅")
+    await query.answer("Пост відредаговано ✅", show_alert=True)
+
+    await query.message.delete()
 
 @router.callback_query(F.data == "🔁 Репост в канал", ParserState.buttons)
 async def repost_to_group(query: CallbackQuery, state: FSMContext):
@@ -133,18 +139,18 @@ async def repost_to_group(query: CallbackQuery, state: FSMContext):
     group_id = await db.get_group_id(telegram_id=query.from_user.id)
 
     if group_id == 0 or group_id is None:
-        await query.answer("Ви не приєднали каналу")
+        await query.answer("Ви не приєднали каналу", show_alert=True)
         return
 
     data: dict = await state.get_data()
     parser: Parser = data.get("parser")
-    await state.clear()
     
-    await query.message.delete()
     try:
         await query.message.bot.send_media_group(chat_id=group_id, media=parser.images)
-        await query.answer("Пост надіслано в канал ✅")
+        await query.answer("Пост надіслано в канал ✅", show_alert=True)
+        await state.clear()
+        await query.message.delete()
     except Exception as e:
-        await query.answer("Перевірте чи правильний id каналу/групи ви приєднали та чи має бот права адміністратора")
-
+        await query.answer("Перевірте чи правильний id каналу/групи який ви приєднали та чи має бот права адміністратора", show_alert=True)
+    
 

@@ -259,7 +259,9 @@ class Parser:
         captions = (
             f"🏡{self.amount_of_rooms}к кв\n" f"🏢Поверх: {self.floor}\n" f"🔑Площа: {self.area}м2\n" f"📍Район: {self.district}\n"
         )
-        main_caption = f"💳️{self.price}" f"\n\n{self.header}" f"\n\n{self.caption}"
+        header = f"\n\n{self.header}" if self.header != "" else ""
+        caption = f"\n\n{self.caption}" if self.caption != "" else ""
+        main_caption = f"💳️{self.price}" f"{header}" f"{caption}"
         end = f"\n\n{self.template}" if self.template != "" else ""
         self.full_caption = captions + main_caption + end 
         self.reset_photo()

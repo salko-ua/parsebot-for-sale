@@ -99,3 +99,5 @@ async def all_message(message: Message):
             " нерухомістю.\nУ форматі https://www.olx.ua/..."
         )
         await message.answer(text, disable_web_page_preview=True)
+
+
