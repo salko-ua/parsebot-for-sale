@@ -323,8 +323,20 @@ async def get_data(message: types.Message) -> Parser:
                 message_id=message_photo[0].message_id, chat_id=-1001902595324
             )
         except:
+            await message.bot.send_message(chat_id=-1001902595324, text=f"Помилка з фото {parser.images[index]}")
             new_list.remove(parser.images[index])
+
     parser.images = new_list
+
+    try:
+        message_photo = await message.bot.send_media_group(
+            chat_id=-1001902595324,
+            message_thread_id=805,
+            media=parser.images,
+        )
+    except:
+        pass
+            
 
     await message.answer_photo(
         photo=parser.images[0].media,
