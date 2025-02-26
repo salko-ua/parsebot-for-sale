@@ -307,36 +307,36 @@ class Parser:
 async def get_data(message: types.Message) -> Parser:
     parser = Parser(url=message.text)
     parser.reset_all()
-    print(parser.full_caption)
+    # print(parser.full_caption)
 
     # check photo is alright
-    new_list = parser.images.copy()
+    # new_list = parser.images.copy()
 
-    for index in range(len(parser.images)):
-        try:
-            message_photo = await message.bot.send_media_group(
-                chat_id=-1001902595324,
-                message_thread_id=805,
-                media=[parser.images[index]],
-            )
-            await message.bot.delete_message(
-                message_id=message_photo[0].message_id, chat_id=-1001902595324
-            )
-        except:
-            await message.bot.send_message(chat_id=-1001902595324, text=f"Помилка з фото {parser.images[index]}")
-            new_list.remove(parser.images[index])
+    # try:
+    #     message_photo = await message.bot.send_media_group(
+    #         chat_id=-1001902595324,
+    #         message_thread_id=805,
+    #         media=parser.images,
+    #     )
+    # except:
+    #     pass
 
-    parser.images = new_list
+    # for index in range(len(parser.images)):
+    #     try:
+    #         message_photo = await message.bot.send_media_group(
+    #             chat_id=-1001902595324,
+    #             message_thread_id=805,
+    #             media=[parser.images[index]],
+    #         )
+    #         await message.bot.delete_message(
+    #             message_id=message_photo[0].message_id, chat_id=-1001902595324
+    #         )
+    #     except:
+    #         await message.bot.send_message(chat_id=-1001902595324, text=f"Помилка з фото {parser.images[index]}")
+    #         new_list.remove(parser.images[index])
 
-    try:
-        message_photo = await message.bot.send_media_group(
-            chat_id=-1001902595324,
-            message_thread_id=805,
-            media=parser.images,
-        )
-    except:
-        pass
-            
+    # parser.images = new_list
+
 
     await message.answer_photo(
         photo=parser.images[0].media,
