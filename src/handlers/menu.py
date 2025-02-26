@@ -273,13 +273,12 @@ async def settings(message: Message):
 @router.message(F.text == "Додати бота")
 @router.channel_post(Command("add"))
 @router.channel_post(F.text == "Додати бота")
-async def change_group(message: Message, state: FSMContext):
+async def change_group(message: Message):
     db = await Database.setup()
     group_id = message.chat.id
 
     await db.update_group_id(telegram_id=message.from_user.id, group_id=group_id)
-    await state.clear()
-    await message.answer("Групу додано ✅")
+    await message.delete()
 
 
 @router.callback_query(F.data == "Змінити шаблон")
