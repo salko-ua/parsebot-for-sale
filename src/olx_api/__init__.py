@@ -68,7 +68,7 @@ class Parser:
 
     def reset_header(self) -> None:
         # parsing caption from the page
-        header_parent = self.soup.find("div", {"data-testid": "ad_title"})
+        header_parent = self.soup.find("div", {"data-testid": "offer_title"})
         if header_parent and isinstance(header_parent, Tag):
             header = header_parent.find(lambda tag: tag.name not in ["style", "script"])
             header = header.text if header else None
@@ -286,7 +286,7 @@ class Parser:
             f"🏡{self.amount_of_rooms}к кв\n"
             f"🏢Поверх: {self.floor}\n"
             f"🔑Площа: {self.area}м2\n"
-            f"📍Район: {self.district}\n"
+            f"📍Район: #{self.district}\n"
         )
         header = f"\n\n{self.header}" if self.header != "" else ""
         caption = f"\n\n{self.caption}" if self.caption != "" else ""
