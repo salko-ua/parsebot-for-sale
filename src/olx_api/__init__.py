@@ -140,7 +140,7 @@ class Parser:
         checklist = []
 
         # find all span tags in div
-        div_with_tags = self.soup.find("div", class_="css-41yf00")
+        div_with_tags = self.soup.find("div", class_="css-5l1a1j")
         if div_with_tags and isinstance(div_with_tags, Tag):
             tags = div_with_tags.find_all("p")
         else:
