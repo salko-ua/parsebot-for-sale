@@ -6,4 +6,4 @@ from src.config import TOKEN
 # GUYS SORRY FOR THAT SHIT
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
-scheduler = AsyncIOScheduler(timezone="Europe/Kiev")
+scheduler = AsyncIOScheduler(timezone="Europe/Kyiv")
