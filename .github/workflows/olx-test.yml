@@ -1,0 +1,17 @@
+name: olx-test
+on: workflow_dispatch
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Who is the runner IP
+        run: curl -sS --max-time 15 https://ipinfo.io/json || true
+      - name: OLX homepage
+        run: |
+          curl -sS -o /dev/null -w 'OLX homepage: %{http_code}\n' \
+            --max-time 30 --http1.1 'https://www.olx.ua/' || true
+      - name: OLX listing page
+        run: |
+          curl -sS -o /dev/null -w 'OLX listing: %{http_code}\n' \
+            --max-time 30 --http1.1 \
+            'https://www.olx.ua/d/uk/obyavlenie/arenda-3-komnatnogo-doma-na-ul-izvilistaya-tsna-znizhena-do-60-000-ID10YI6N.html' || true
