@@ -218,15 +218,18 @@ class Parser:
 
         # add urls to list
         for src in images:
-            list_src_photo.append(src.get("src"))
+            url = src.get("src")
+            if url and url.startswith("http"):
+                list_src_photo.append(url)
 
         # if images more then 10 cut to 10
         if len(list_src_photo) > 10:
             del list_src_photo[10:]
 
-        # add images_url to media_group
+        # upload photo bytes ourselves: Telegram's own fetcher
+        # is unreliable with olxcdn urls
         for photo_url in list_src_photo:
-            media_group.add_photo(media=photo_url)
+            media_group.add_photo(media=types.URLInputFile(photo_url))
 
         # save images
         self.images = media_group.build()
@@ -308,36 +311,12 @@ async def get_data(message: types.Message) -> Parser:
     parser = Parser(url=message.text)
     parser.reset_all()
 
-    new_list = parser.images.copy()
-
-    try:
-        message_photo = await message.bot.send_media_group(
-            chat_id=-1001902595324,
-            message_thread_id=805,
-            media=parser.images,
+    if parser.images:
+        await message.answer_photo(
+            photo=parser.images[0].media,
+            caption=parser.full_caption,
+            reply_markup=edit_parse_advert(),
         )
-    except:
-        pass
-
-    for index in range(len(parser.images)):
-        try:
-            message_photo = await message.bot.send_media_group(
-                chat_id=-1001902595324,
-                message_thread_id=805,
-                media=[parser.images[index]],
-            )
-            await message.bot.delete_message(
-                message_id=message_photo[0].message_id, chat_id=-1001902595324
-            )
-        except:
-            await message.bot.send_message(chat_id=-1001902595324, text=f"Помилка з фото {parser.images[index]}")
-            new_list.remove(parser.images[index])
-
-    parser.images = new_list
-
-    await message.answer_photo(
-        photo=parser.images[0].media,
-        caption=parser.full_caption,
-        reply_markup=edit_parse_advert(),
-    )
-    return parser
+        return parser
+    else:
+        await message.answer(text=parser.full_caption, reply_markup=edit_parse_advert())

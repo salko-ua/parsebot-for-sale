@@ -3,6 +3,7 @@ import sentry_sdk
 from aiogram import Dispatcher
 
 from src.config import SENTRY_SDK
+from src.control_db import Database
 from src.middleware import CheckConnectioError
 from src.handlers import admin, menu, parsing, payments, task, telegram
 
@@ -24,7 +25,13 @@ async def start_bot():
     await task.create_tasks()
     await bot.delete_webhook(drop_pending_updates=True)
     print("Bot Online")
-    await dp.start_polling(bot)
+    try:
+        await dp.start_polling(bot)
+    finally:
+        # aiosqlite керує з'єднанням в окремому non-daemon потоці:
+        # якщо його не закрити, процес не завершується після Ctrl+C
+        db = await Database.setup()
+        await db.base.close()
 
 
 async def main():
