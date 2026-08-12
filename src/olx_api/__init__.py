@@ -1,16 +1,36 @@
 import re
+import ssl
+
 import requests
 from aiogram import types
 from aiogram.utils.media_group import MediaGroupBuilder
 from bs4 import BeautifulSoup
 from bs4.element import Tag
+from requests.adapters import HTTPAdapter
 from src.keyboards.parsing_edit import edit_parse_advert
+
+# OLX стоїть за CloudFront/AWS WAF, який блокує стандартний TLS-відпечаток
+# python-requests (403 від edge, ще до origin) при запитах з дата-центрових IP.
+# Скорочений список шифрів змінює ClientHello — запит проходить.
+CIPHERS = "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256"
+
+
+class TLSAdapter(HTTPAdapter):
+    def init_poolmanager(self, *args, **kwargs):
+        context = ssl.create_default_context()
+        context.set_ciphers(CIPHERS)
+        kwargs["ssl_context"] = context
+        return super().init_poolmanager(*args, **kwargs)
+
+
+session = requests.Session()
+session.mount("https://", TLSAdapter())
 
 
 class Parser:
     def __init__(self, url):
         self.url = url
-        self.response = requests.get(url)
+        self.response = session.get(url)
         self.soup = BeautifulSoup(self.response.content, "html.parser")
         self.images = []
         self.amount_of_rooms = ""
